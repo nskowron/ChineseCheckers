@@ -53,7 +53,8 @@ public class Board implements Serializable
 
     private Node findNodeById(int id) 
     {
-        for (Node node : nodes) {
+        for (Node node : nodes) 
+        {
             if (node.id == id) return node;
         }
         return null;
