@@ -1,4 +1,4 @@
-# Branch Patch Notes:
+# Chinese Checkers:
 ## 07.12.2024 
 - Added:
   - Client base template
