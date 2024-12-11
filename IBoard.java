@@ -1,6 +1,8 @@
 import java.io.Serializable;
+import java.util.List;
 
 public interface IBoard extends Serializable
 {
-    public void move(int beginID, int endID);
+    public List<Node> getNodes(); 
+    public Node findNodeById(int id);
 }
