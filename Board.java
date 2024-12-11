@@ -2,62 +2,33 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board implements Serializable
+public class Board implements IBoard
 {
     private List<Node> nodes;
 
     public Board() 
     {
         this.nodes = new ArrayList<>();
+        //TODO: Implement node linking
     }
 
-    public void addNode(Node node)
-    {
-        this.nodes.add(node);
-    }
-    
-    public void addNode(List<Node> nodeList)
-    {
-        for(Node input : nodeList)
-        {
-            this.nodes.add(input);
-        }
-    }
-
-    public boolean validMove(int startId, int endId) 
+    public void move(int startId, int endId) throws IllegalAccessError
     {
         Node start = findNodeById(startId);
         Node end = findNodeById(endId);
 
-        if (start == null || end == null) return false;
-
-        // TODO add jump validation!!! (you can jump over 1 node if its taken)
-
-        return start.neighbors.contains(end) && end.owner == 0;
+        end.place(start.getPiece());
+        start.take();
     }
 
-    public void makeMove(int startId, int endId, int playerId) 
+    private Node findNodeById(int id) throws IllegalAccessError
     {
-        if (validMove(startId, endId)) 
+        for(Node node : nodes) 
         {
-            Node start = findNodeById(startId);
-            Node end = findNodeById(endId);
-
-            if (start != null && end != null) 
-            {
-                start.owner = 0;
-                end.owner = playerId;
-            }
+            if(node.getID() == id) return node;
         }
-    }
-
-    private Node findNodeById(int id) 
-    {
-        for (Node node : nodes) 
-        {
-            if (node.id == id) return node;
-        }
-        return null;
+        
+        throw new IllegalAccessError("Can't find node");
     }
 
     public List<Node> getNodes() 
