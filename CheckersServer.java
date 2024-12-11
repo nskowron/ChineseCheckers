@@ -6,9 +6,6 @@ public class CheckersServer
 {
     private static final int PORT = 12345;
 
-    // TODO: figure out taking user inputs when it's user's turn
-    // ask users for readiness and try to create game
-    // if game cannot be created wait for more users
     public static void main(String[] args) 
     {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) 
