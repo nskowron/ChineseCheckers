@@ -1,8 +1,14 @@
 # Chinese Checkers:
+## 11.12.2024 - Nel
+- Updated:
+  - CLI's config
+  - Added TODO's
+
 ## 11.12.2024 - Jan
 - Added:
   - Move struct for organization
   - CLI class w/ Executable interface
+  - Client Handler for easier controll over clients
 - Updated:
   - Game class /w move support
   - Client w/ CLI
@@ -14,6 +20,7 @@
   - Validity Interface
   - Game class
   - Piece class
+  - Various small fixes
 - Updated:
   - Board class w/ exceptions
   - Node class w/ Piece & exceptions

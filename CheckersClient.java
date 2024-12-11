@@ -23,6 +23,13 @@ public class CheckersClient
             {
                 playerId = (Integer) in.readObject();
                 System.out.println("Received Id from server: "+playerId);
+                out.writeObject("GET_BOARD");
+                out.flush();
+                System.out.println("Request sent to server: GET_BOARD");
+
+                // TODO Implement Board display (much later)
+                IBoard board = (IBoard) in.readObject();
+                System.out.println("Received boardbase  from server");
             } 
             catch (Exception e) 
             {
@@ -32,35 +39,6 @@ public class CheckersClient
 
             // Initialize CLI
             CLI cli = new CLI();
-
-            // Add CLI commands
-            cli.addCommand("request board", new Executable()
-            {
-                @Override
-                public void run() 
-                {
-                    try 
-                    {
-                        out.writeObject("GET_BOARD");
-                        out.flush();
-                        System.out.println("Request sent to server: GET_BOARD");
-
-                        Board board = (Board) in.readObject();
-                        System.out.println("Received board from server:");
-                        System.out.println(board);
-                    } 
-                    catch (Exception e) 
-                    {
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                }
-
-                @Override
-                public String getDescription() 
-                {
-                    return "Request the current board state from the server.";
-                }
-            });
 
             cli.addCommand("ready", new Executable() 
             {
@@ -89,7 +67,7 @@ public class CheckersClient
                 }
             });
 
-            cli.addCommand("Nready", new Executable() 
+            cli.addCommand("!ready", new Executable() 
             {
                 @Override
                 public void run() 
@@ -116,7 +94,7 @@ public class CheckersClient
                 }
             });
 
-            cli.addCommand("send move", new Executable() 
+            cli.addCommand("move", new Executable() 
             {
                 @Override
                 public void run() 
@@ -134,8 +112,8 @@ public class CheckersClient
                         out.flush();
                         System.out.println("Move sent to server: " + moveBegin + " -> " + moveEnd);
 
-                        //String response = (String) in.readObject();
-                        //System.out.println("Server response: " + response);
+                        String response = (String) in.readObject();
+                        System.out.println("Server response: " + response);
                     } 
                     catch (Exception e) 
                     {
@@ -151,7 +129,6 @@ public class CheckersClient
             });
 
             cli.run(scanner);
-
         } 
         catch (IOException e) 
         {

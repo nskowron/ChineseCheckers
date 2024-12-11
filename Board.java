@@ -9,7 +9,7 @@ public class Board implements IBoard
     {
         this.nodes = new ArrayList<>();
 
-        //TODO: Implement node linking
+        //TODO: Implement node linking(later)
         for(int i = 0; i < 100; ++i)
         {
             nodes.add(new Node(i));
