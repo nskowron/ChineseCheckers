@@ -1,4 +1,3 @@
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +8,7 @@ public class Board implements IBoard
     public Board() 
     {
         this.nodes = new ArrayList<>();
+
         //TODO: Implement node linking - but not now Janek
         for(int i = 0; i < 100; ++i)
         {
@@ -21,11 +21,14 @@ public class Board implements IBoard
         Node start = findNodeById(startId);
         Node end = findNodeById(endId);
 
-        end.place(start.getPiece());
-        start.take();
+        // Temporary
+        for(int i = 0; i < 100; ++i)
+        {
+            nodes.add(new Node(i));
+        }
     }
 
-    private Node findNodeById(int id) throws IllegalAccessError
+    public Node findNodeById(int id) throws IllegalAccessError
     {
         for(Node node : nodes) 
         {

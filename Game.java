@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.List;
 
 public class Game implements Serializable
 {
@@ -20,15 +21,17 @@ public class Game implements Serializable
         this.players = players;
     }
 
-    public move(int beginID, int endID, int playerID) throws IllegalArgumentException
+    public void move(Move move) throws IllegalArgumentException
     {
-        if(checker.validMove(beginID, endID, playerID))
-        {
-            board.move(beginID, endID);
-        }
-        else
-        {
-            throw new IllegalArgumentException("Invalid Move");
-        }
+        Node start = board.findNodeById(move.startId);
+        Node end = board.findNodeById(move.endId);
+
+        end.place(start.getPiece());
+        start.take();
+    }
+
+    public IBoard getBoard()
+    {
+        return this.board;
     }
 }
