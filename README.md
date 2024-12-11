@@ -1,4 +1,9 @@
 # Chinese Checkers:
+## Build and run project
+- `make`
+- `make runS` - to run server
+- `make runC` - to run client
+
 ## 11.12.2024 - Nel
 - Updated:
   - CLI's config
