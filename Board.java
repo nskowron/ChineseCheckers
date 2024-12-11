@@ -9,7 +9,11 @@ public class Board implements IBoard
     public Board() 
     {
         this.nodes = new ArrayList<>();
-        //TODO: Implement node linking
+        //TODO: Implement node linking - but not now Janek
+        for(int i = 0; i < 100; ++i)
+        {
+            nodes.add(new Node(i));
+        }
     }
 
     public void move(int startId, int endId) throws IllegalAccessError

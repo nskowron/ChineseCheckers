@@ -19,6 +19,11 @@ public class Node implements Serializable
         this.neighbors = new ArrayList<>();
     }
 
+    public Node(int id, int playerTarget)
+    {
+        this(id, playerTarget, null);
+    }
+
     public Node(int id) 
     {
         this(id, -1, null);

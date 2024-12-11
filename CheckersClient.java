@@ -6,6 +6,9 @@ public class CheckersClient
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
 
+    //TODO: loop to get user inputs
+    // send inputs to server
+    // at the beginning mark readiness and wait for game
     public static void main(String[] args) 
     {
         // try-with-resources (closes streams after fail automatically)
