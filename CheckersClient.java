@@ -134,8 +134,8 @@ public class CheckersClient
                         out.flush();
                         System.out.println("Move sent to server: " + moveBegin + " -> " + moveEnd);
 
-                        String response = (String) in.readObject();
-                        System.out.println("Server response: " + response);
+                        //String response = (String) in.readObject();
+                        //System.out.println("Server response: " + response);
                     } 
                     catch (Exception e) 
                     {

@@ -80,7 +80,7 @@ public class CheckersServer
                         {
                             game.move(move);
                         }
-                        catch (IllegalArgumentException e)
+                        catch (IllegalArgumentException | IllegalAccessError e)
                         {
                             e.printStackTrace();
                         }
