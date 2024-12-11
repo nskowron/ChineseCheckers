@@ -1,4 +1,4 @@
 public interface IValidityChecker
 {
-    public boolean validMove(int beginID, int endID, int playerID);
+    public boolean validMove(Move move);
 }

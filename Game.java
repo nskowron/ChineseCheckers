@@ -23,11 +23,14 @@ public class Game implements Serializable
 
     public void move(Move move) throws IllegalArgumentException
     {
-        Node start = board.findNodeById(move.startId);
-        Node end = board.findNodeById(move.endId);
-
-        end.place(start.getPiece());
-        start.take();
+        if(checker.validMove(move))
+        {
+            board.move(move.startId, move.endId);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Invalid move");
+        }
     }
 
     public IBoard getBoard()

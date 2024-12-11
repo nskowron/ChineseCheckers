@@ -1,7 +1,7 @@
 public class ValidityChecker implements IValidityChecker
 {
     @Override
-    public boolean validMove(int beginID, int endID, int playerID)
+    public boolean validMove(Move move)
     {
         return true;
     }

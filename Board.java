@@ -9,7 +9,7 @@ public class Board implements IBoard
     {
         this.nodes = new ArrayList<>();
 
-        //TODO: Implement node linking - but not now Janek
+        //TODO: Implement node linking
         for(int i = 0; i < 100; ++i)
         {
             nodes.add(new Node(i));
@@ -21,11 +21,8 @@ public class Board implements IBoard
         Node start = findNodeById(startId);
         Node end = findNodeById(endId);
 
-        // Temporary
-        for(int i = 0; i < 100; ++i)
-        {
-            nodes.add(new Node(i));
-        }
+        end.place(start.getPiece());
+        start.take();
     }
 
     public Node findNodeById(int id) throws IllegalAccessError
