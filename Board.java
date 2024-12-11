@@ -14,6 +14,10 @@ public class Board implements IBoard
         {
             nodes.add(new Node(i));
         }
+        for(int i = 0; i < 10; ++i)
+        {
+            nodes.get(i).place(new Piece(0));
+        }
     }
 
     public void move(int startId, int endId) throws IllegalAccessError

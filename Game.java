@@ -14,11 +14,12 @@ public class Game implements Serializable
         this.board = board;
 
         //TODO: Add checking for right number of players etc
-        if(players.size() == 0)
-        {
-            throw new IllegalArgumentException("Wrong players");
-        }
         this.players = players;
+    }
+
+    public Game(IValidityChecker checker, IBoard board) throws IllegalArgumentException
+    {
+        this(checker, board, null);
     }
 
     public void move(Move move) throws IllegalArgumentException
