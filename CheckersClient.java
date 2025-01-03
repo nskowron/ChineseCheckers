@@ -26,7 +26,7 @@ public class CheckersClient extends Application
         BoardGridPane boardGridPane = new BoardGridPane();
 
         // Generate the star pattern
-        boardGridPane.createGrid(19, 27, 25);  // 17x25 grid, with radius 20
+        boardGridPane.createBoard(25);
 
         // Set up the scene and stage
         Scene scene = new Scene(boardGridPane, 400, 400);
