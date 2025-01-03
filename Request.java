@@ -1,22 +1,66 @@
+import java.nio.ReadOnlyBufferException;
+
 public enum Request
 {
-    MOVE
+    GREET,
+    END_TURN,
+    UPDATE,
+    ACKNOWLEDGE,
+    READY
     {
-        private Move move;
-
         @Override
         public void setData(Object data) throws ClassCastException
         {
-            move = (Move)data;
+            if(data instanceof Boolean)
+            {
+                super.setData(data);
+            }
+            else
+            {
+                throw new ClassCastException("Request.READY only takes in boolean");
+            }
         }
-
+    },
+    GET_MOVES
+    {
         @Override
-        public Object getData()
+        public void setData(Object data) throws ClassCastException
         {
-            return move;
+            if(data instanceof Integer)
+            {
+                super.setData(data);
+            }
+            else
+            {
+                throw new ClassCastException("Request.GET_MOVES only takes in int");
+            }
+        }
+    },
+    MOVE
+    {
+        @Override
+        public void setData(Object data) throws ClassCastException
+        {
+            if(data instanceof Move)
+            {
+                super.setData(data);
+            }
+            else
+            {
+                throw new ClassCastException("Request.MOVE only takes in Move");
+            }
         }
     };
 
-    public abstract void setData(Object data);
-    public abstract Object getData();
+    protected Object data = null;
+
+    public void setData(Object data)
+    {
+        this.data = data;
+    }
+
+    public Object getData()
+    {
+        return data;
+    }
 }
