@@ -4,9 +4,8 @@ import java.util.List;
 
 public class Node implements Serializable
 {
-    private final int id;
-
-    private final int playerTarget;
+    public final int id;
+    public final int playerTarget;
 
     private Piece placeholder;
     private List<Node> neighbors;
@@ -16,7 +15,7 @@ public class Node implements Serializable
         this.id = id;
         this.playerTarget = playerTarget;
         this.placeholder = piece;
-        this.neighbors = new ArrayList<>();
+        this.neighbors = new ArrayList<>(6);
     }
 
     public Node(int id, int playerTarget)
@@ -29,16 +28,16 @@ public class Node implements Serializable
         this(id, -1, null);
     }
 
-    public void addNeighbor(Node neighbor) 
+    public void addNeighbor(int idx, Node neighbor) 
     {
-        this.neighbors.add(neighbor);
+        this.neighbors.add(idx, neighbor);
     }
 
-    public void addNeighbors(List<Node> neighbors) 
+    public void addNeighbors(ArrayList<Node> neighbors) 
     {
-        for(Node input : neighbors)
+        if(neighbors.size() == 6)
         {
-            this.neighbors.add(input);
+            this.neighbors = neighbors;
         }
     }
 
@@ -47,11 +46,13 @@ public class Node implements Serializable
         return neighbors;
     }
 
+    @Deprecated
     public int getID()
     {
         return id;
     }
 
+    @Deprecated
     public int getPlayerTarget()
     {
         return playerTarget;

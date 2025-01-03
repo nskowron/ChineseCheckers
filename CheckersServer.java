@@ -12,6 +12,7 @@ public class CheckersServer
 
     public static void main(String[] args) 
     {
+        Request req = Request.MOVE;
         Game game = new Game(new ValidityChecker(), new Board());
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) 

@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Board implements IBoard
 {
-    private List<Node> nodes;
+    private Map<Integer, Node> nodes;
 
     public Board() 
     {
@@ -29,14 +30,9 @@ public class Board implements IBoard
         start.take();
     }
 
-    public Node findNodeById(int id) throws IllegalAccessError
+    public Node findNodeById(int id)
     {
-        for(Node node : nodes) 
-        {
-            if(node.getID() == id) return node;
-        }
-        
-        throw new IllegalAccessError("Can't find node");
+        return nodes.get(id);
     }
 
     public List<Node> getNodes() 

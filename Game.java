@@ -22,11 +22,11 @@ public class Game implements Serializable
         this(checker, board, null);
     }
 
-    public synchronized void move(Move move) throws IllegalArgumentException, IllegalAccessError
+    public void move(Move move) throws IllegalArgumentException, IllegalAccessError
     {
         if(checker.validMove(move))
         {
-            //board.move(move.startId, move.endId);
+            board.move(move.startId, move.endId);
         }
         else
         {
