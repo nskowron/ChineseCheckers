@@ -1,6 +1,6 @@
 all:
 	javac CheckersServer.java
-	javac --module-path ../javaFX/lib --add-modules javafx.controls CheckersClient.java
+	javac --module-path ./javaFX/lib --add-modules javafx.controls CheckersClient.java
 
 clean:
 	rm -rf *.class
@@ -9,4 +9,4 @@ runS:
 	java CheckersServer
 
 runC:
-	java java --module-path ../javaFX/lib --add-modules javafx.controls CheckersClient
+	java --module-path ./javaFX/lib --add-modules javafx.controls CheckersClient

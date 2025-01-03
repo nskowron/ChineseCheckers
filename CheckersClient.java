@@ -1,15 +1,44 @@
+import javafx.application.Application;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
-public class CheckersClient 
+public class CheckersClient extends Application
 {
 
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
 
+    @Override
+    public void start(Stage primaryStage) 
+    {
+        // Create an instance of your custom BoardGridPane
+        BoardGridPane boardGridPane = new BoardGridPane();
+
+        // Generate the star pattern
+        boardGridPane.createGrid(19, 27, 25);  // 17x25 grid, with radius 20
+
+        // Set up the scene and stage
+        Scene scene = new Scene(boardGridPane, 400, 400);
+        primaryStage.setTitle("Chinese Checkers Board");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     public static void main(String[] args) 
     {
+        launch(args);
+
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
@@ -36,99 +65,6 @@ public class CheckersClient
                 System.out.println("Id assigment failed, Error: " + e.getMessage());
                 return;
             }
-
-            // Initialize CLI
-            CLI cli = new CLI();
-
-            cli.addCommand("ready", new Executable() 
-            {
-                @Override
-                public void run() 
-                {
-                    try 
-                    {
-                        out.writeObject("GET_READY");
-                        out.flush();
-                        System.out.println("Request sent to server: GET_READY");
-
-                        String response = (String) in.readObject();
-                        System.out.println("Server response: " + response);
-                    } 
-                    catch (Exception e) 
-                    {
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                }
-
-                @Override
-                public String getDescription() 
-                {
-                    return "Notify server that the player is ready.";
-                }
-            });
-
-            cli.addCommand("!ready", new Executable() 
-            {
-                @Override
-                public void run() 
-                {
-                    try 
-                    {
-                        out.writeObject("GET_NOT_READY");
-                        out.flush();
-                        System.out.println("Request sent to server: GET_NOT_READY");
-
-                        String response = (String) in.readObject();
-                        System.out.println("Server response: " + response);
-                    } 
-                    catch (Exception e) 
-                    {
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                }
-
-                @Override
-                public String getDescription() 
-                {
-                    return "Notify server that the player is not ready.";
-                }
-            });
-
-            cli.addCommand("move", new Executable() 
-            {
-                @Override
-                public void run() 
-                {
-                    try 
-                    {
-                        System.out.println("Enter move beginId: ");
-                        int moveBegin = Integer.parseInt(scanner.nextLine().trim()); // Parse to int
-
-                        System.out.println("Enter move endId: ");
-                        int moveEnd = Integer.parseInt(scanner.nextLine().trim()); // Parse to int
-
-                        out.writeObject("SEND_MOVE");
-                        out.writeObject(new Move(moveBegin, moveEnd, playerId));
-                        out.flush();
-                        System.out.println("Move sent to server: " + moveBegin + " -> " + moveEnd);
-
-                        String response = (String) in.readObject();
-                        System.out.println("Server response: " + response);
-                    } 
-                    catch (Exception e) 
-                    {
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                }
-
-                @Override
-                public String getDescription() 
-                {
-                    return "Send a move to the server (requires two arguments).";
-                }
-            });
-
-            cli.run(scanner);
         } 
         catch (IOException e) 
         {

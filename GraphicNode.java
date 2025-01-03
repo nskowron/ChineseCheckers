@@ -5,21 +5,12 @@ public class GraphicNode extends Circle
 {
     private int id;
 
-    public GraphicNode(int id, double centerX, double centerY, double radius, Color color) 
+    public GraphicNode(int id, double centerX, double centerY, double radius, Color colorIN, Color colorOUT) 
     {
         super(centerX, centerY, radius);
         this.id = id;
-        setFill(color);
-        setStroke(Color.BLACK);
-    }
-
-    public int getId() 
-    {
-        return id;
-    }
-
-    public void setId(int id) 
-    {
-        this.id = id;
+        setStrokeWidth(5);
+        setFill(colorIN);
+        setStroke(colorOUT);
     }
 }
