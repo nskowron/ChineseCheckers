@@ -27,7 +27,7 @@ public class Game implements Serializable
         this(checker, board, null);
     }
 
-    public void move(Move move) throws IllegalAccessError
+    public void move(Player player, Move move) throws IllegalAccessError
     {
         if(move.playerId != players.get(currentTurn).id)
         {
@@ -60,7 +60,7 @@ public class Game implements Serializable
             Node neighbor = beginNode.getNeighbors().get(i); // consider Node.getNeighbor(int)
             while(neighbor != null)
             {
-                if(checker.validMove(Move(player.id, beginId, neighbor.id)))
+                if(checker.validMove(Move(beginId, neighbor.id)))
                 {
                     endIds.add(neigbor.id);
                     break;
@@ -72,9 +72,9 @@ public class Game implements Serializable
         return endIds;
     }
 
-    public void endTurn(int playerId) throws IllegalAccessError
+    public void endTurn(Player player) throws IllegalAccessError
     {
-        if(playerId == players.get(currentTurn).id)
+        if(player.id == players.get(currentTurn).id)
         {
             for(int i = 1; i < players.size(); ++i)
             {

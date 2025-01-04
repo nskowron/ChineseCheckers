@@ -40,7 +40,20 @@ public class ClientHandler implements Runnable
             requestHandler = getDefaultRequestHandler(out, in);
 
             Thread readiness = new Thread(() -> {
-                // continue work here
+                while(true)
+                {
+                    Request request = (Request)in.readObject();
+                    if(request == Request.READY)
+                    {
+                        requestHandler.get(request).run(request);
+                    }
+                    else
+                    {
+                        Request error = Request.ERROR;
+                        error.setData(new Error("Game has not started yet"));
+                        out.writeObject(error);
+                    }
+                }
             });
             // Send greeting with client ID
             out.writeObject(clientId);
@@ -130,7 +143,6 @@ public class ClientHandler implements Runnable
         requestHandler.put(Request.GREET, (Request greet) -> {
             Request ack = Request.ACKNOWLEDGE;
             ack.setData(player);
-
             out.writeObject(ack);
         });
 
@@ -138,14 +150,14 @@ public class ClientHandler implements Runnable
             try
             {
                 game.endTurn(player);
-
-                out.writeObject(Request.ACKNOWLEDGE);
+                Request ack = Request.ACKNOWLEDGE;
+                ack.setData(game.getCurrentTurn());
+                out.writeObject(ack);
             }
             catch(IllegalAccessError e)
             {
                 Request error = Request.ERROR;
                 error.setData(e);
-
                 out.writeObject(error);
             }
         });
@@ -154,7 +166,6 @@ public class ClientHandler implements Runnable
             GameState state = new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin());
             Request ack = Request.ACKNOWLEDGE;
             ack.setData(state);
-
             out.writeObject(ack);
         });
 
@@ -170,14 +181,12 @@ public class ClientHandler implements Runnable
             if(ready.getData() != null)
             {
                 this.ready = (Boolean)ready.getData();
-
                 out.writeObject(Request.ACKNOWLEDGE);
             }
             else
             {
                 Request error = Request.ERROR;
                 error.setData(new Error("Cannot set readiness to null"));
-
                 out.writeObject(error);
             }
         });
@@ -185,7 +194,6 @@ public class ClientHandler implements Runnable
         request.put(Request.GET_MOVES, (Request get) -> {
             Request moves = Request.ACKNOWLEDGE;
             moves.setData(game.getValidMoves(player, (String)get.getData()));
-
             out.writeObject(moves);
         });
 
@@ -193,16 +201,16 @@ public class ClientHandler implements Runnable
             try
             {
                 game.move((Move)move.getData());
-
                 out.writeObject(Request.ACKNOWLEDGE);
             }
             catch(IllegalAccessError e)
             {
                 Request error = Request.ERROR;
                 error.setData(e);
-
                 out.writeObject(error);
             }
         });
+
+        return requestHandler;
     }
 }
