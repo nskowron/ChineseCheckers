@@ -5,13 +5,13 @@ public class ClientHandler implements Runnable
 {
     private Socket clientSocket;
     private Game game;
-    public final int clientId;
+    private Player player;
 
-    public ClientHandler(Socket clientSocket, Game game, int clientId) 
+    public ClientHandler(Socket clientSocket, Game game, Player player) 
     {
         this.clientSocket = clientSocket;
         this.game = game;
-        this.clientId = clientId;
+        this.player = player;
     }
 
     public void sendBoardUpdate(IBoard board) 

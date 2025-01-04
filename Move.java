@@ -2,14 +2,14 @@ import java.io.Serializable;
 
 public class Move implements Serializable
 {
-    public final int startId;
-    public final int endId;
     public final int playerId;
+    public final String startId;
+    public final String endId;
 
-    public Move(int begin, int end, int player)
+    public Move(int Player, String beginId, String endId)
     {
-        this.startId = begin;
-        this.endId = end;
         this.playerId = player;
+        this.startId = beginId;
+        this.endId = endId;
     }
 }

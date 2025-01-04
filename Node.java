@@ -4,28 +4,24 @@ import java.util.List;
 
 public class Node implements Serializable
 {
-    public final int id;
-    public final int playerTarget;
+    public final String id;
+    public final Color colorStarting;
+    public final Color colorTarget;
 
     private Piece placeholder;
     private List<Node> neighbors;
 
-    public Node(int id, int playerTarget, Piece piece) 
+    public Node(String id, Color colorStarting, Color colorTarget) 
     {
         this.id = id;
-        this.playerTarget = playerTarget;
-        this.placeholder = piece;
-        this.neighbors = new ArrayList<>(6);
+        this.colorStarting = colorStarting;
+        this.colorTarget = colorTarget;
+        this.neighbors = new ArrayList<>(6, null);
     }
 
-    public Node(int id, int playerTarget)
+    public Node(String id)
     {
-        this(id, playerTarget, null);
-    }
-
-    public Node(int id) 
-    {
-        this(id, -1, null);
+        this(id, Color.DEFAULT, Color.DEFAULT);
     }
 
     public void addNeighbor(int idx, Node neighbor) 
@@ -47,15 +43,9 @@ public class Node implements Serializable
     }
 
     @Deprecated
-    public int getID()
+    public String getID()
     {
         return id;
-    }
-
-    @Deprecated
-    public int getPlayerTarget()
-    {
-        return playerTarget;
     }
 
     public Piece getPiece()
