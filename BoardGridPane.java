@@ -13,8 +13,7 @@ public class BoardGridPane extends GridPane {
     public BoardGridPane() 
     {   
         super();
-        setHgap(3);  // Horizontal gap
-        setVgap(6);  // Vertical gap
+        setHgap(0);  // Horizontal gap
         setBackground(new Background(new BackgroundFill(Color.rgb(50, 50, 50), null, null)));
         addStarPositions();
     }
@@ -162,32 +161,35 @@ public class BoardGridPane extends GridPane {
 
     }
 
-    public void putGraphicNode(int row, int col, double radius) 
+    public void putGraphicNode(int row, int col, double radius, GameUI UI) 
     {
         String positionKey = row + "," + col;
 
-        // Only add the node if it's a star position
         if (!starPositions.containsKey(positionKey)) 
         {
             return;
         }
 
-        String id = starPositions.get(positionKey);  // Get the color for the position
-        GraphicNode node = new GraphicNode(id, 0, 0, radius, Color.GRAY, Color.GRAY);
+        String id = starPositions.get(positionKey);
+
+        GraphicNode node = new GraphicNode(id, 0, 0, radius, Color.rgb(50, 50, 50), Color.GRAY);
+
         add(node, col, row); // Place the node at (col, row)
+        UI.addNode(node); // Add to GameUI
     }
 
-    public void createBoard(double radius) 
+    public void createBoard(double radius, GameUI UI) 
     {
-        int rows = 19;
-        int cols = 27;
-        double spacing = 2.2 * radius; // Adjust spacing as needed
+        int rows = 20;
+        int cols = 28;
+
+        setVgap(radius*1.2);  // Vertical gap
         
         for (int row = 0; row < rows; row++) 
         {
             for (int col = 0; col < cols; col++) 
             {
-                putGraphicNode(row, col, radius);
+                putGraphicNode(row, col, radius, UI);
             }
         }
     }
