@@ -11,13 +11,13 @@ public enum Request
         @Override
         public void setData(Object data) throws ClassCastException
         {
-            if(data instanceof String)
+            if(data instanceof Error)
             {
                 super.setData(data);
             }
             else
             {
-                throw new ClassCastException("Request.ERROR only takes in string");
+                throw new ClassCastException("Request.ERROR only takes in Error");
             }
         }
     },

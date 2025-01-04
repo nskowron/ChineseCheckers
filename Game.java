@@ -43,7 +43,7 @@ public class Game implements Serializable
         }
     }
 
-    public List<String> getValidMoves(int playerId, String beginId)
+    public List<String> getValidMoves(Player player, String beginId)
     {
         List<String> endIds = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class Game implements Serializable
             Node neighbor = beginNode.getNeighbors().get(i); // consider Node.getNeighbor(int)
             while(neighbor != null)
             {
-                if(checker.validMove(Move(playerId, beginId, neighbor.id)))
+                if(checker.validMove(Move(player.id, beginId, neighbor.id)))
                 {
                     endIds.add(neigbor.id);
                     break;
@@ -92,5 +92,10 @@ public class Game implements Serializable
     public IBoard getBoard()
     {
         return this.board;
+    }
+
+    public Player getCurrentTurn()
+    {
+        return players.get(currentTurn);
     }
 }
