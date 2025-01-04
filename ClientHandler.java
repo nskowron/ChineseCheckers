@@ -34,8 +34,8 @@ public class ClientHandler implements Runnable
     @Override
     public void run() 
     {
-        try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-             ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) 
+        try(ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) 
         {
             requestHandler = getDefaultRequestHandler(out, in);
 
@@ -45,7 +45,7 @@ public class ClientHandler implements Runnable
                     Request request = (Request)in.readObject();
                     if(request == Request.READY)
                     {
-                        requestHandler.get(request).run(request);
+                        requestHandler.get(Request.READY).run(request);
                     }
                     else
                     {
@@ -55,73 +55,34 @@ public class ClientHandler implements Runnable
                     }
                 }
             });
-            // Send greeting with client ID
-            out.writeObject(clientId);
-            out.flush();
 
-            while (true) 
+            readiness.start();
+            gameStarted.await();
+            readiness.stop(); // I know the risk
+            
+            while(true)
             {
-                String clientRequest = (String) in.readObject();
-                System.out.println("Client " + clientId + " request: " + clientRequest);
-
-                switch (clientRequest) 
+                Request request = (Request)in.readObject();
+                RequestRunnable action = requestHandler.get(request);
+                if(action != null)
                 {
-                    case "GET_BOARD":
-                        out.writeObject(game.getBoard());
-                        out.flush();
-                        System.out.println("Board sent to client " + clientId + ".");
-                        break;
-
-                    case "GET_READY":
-                        out.writeObject("Client " + clientId + " is now ready!");
-                        out.flush();
-                        System.out.println("Client " + clientId + " marked as ready.");
-                        break;
-
-                    case "GET_NOT_READY":
-                        out.writeObject("Client " + clientId + " is now not ready.");
-                        out.flush();
-                        System.out.println("Client " + clientId + " marked as not ready.");
-                        break;
-
-                    case "SEND_MOVE":
-                        Move move = (Move) in.readObject();
-                        synchronized (game) 
-                        {
-                            System.out.println("Client " + clientId + " sent move: " + move.startId + " -> " + move.endId);
-
-                            try 
-                            {
-                                game.move(move);
-
-                                out.writeObject("Moved succesfully: " +  move.startId + " -> " + move.endId);
-                                out.flush();
-
-                                // Notify all clients about the updated board
-                                CheckersServer.broadcastBoardUpdate(game.getBoard());
-                            } 
-                            catch (IllegalArgumentException e) 
-                            {
-                                e.printStackTrace();
-                                out.writeObject("Error while moving: " + e.getMessage());
-                                out.flush();
-                            }
-                        }
-                        break;
-
-                    default:
-                        out.writeObject("Error: Unknown request.");
-                        System.out.println("Unknown request from client " + clientId + ": " + clientRequest);
+                    action.run(request);
+                }
+                else
+                {
+                    Request error = Request.ERROR;
+                    error.setData("Non-handled request");
+                    out.writeObject(error);
                 }
             }
         } 
-        catch (EOFException e) 
+        catch(EOFException e) 
         {
-            System.out.println("Client " + clientId + " disconnected.");
+            LOGGER.info("Client disconnected");
         } 
-        catch (IOException | ClassNotFoundException e) 
+        catch(IOException | ClassNotFoundException e) 
         {
-            e.printStackTrace();
+            LOGGER.severe("Communication error:\n" + e.getMessage());
         } 
         finally 
         {
@@ -131,12 +92,12 @@ public class ClientHandler implements Runnable
             } 
             catch (IOException e) 
             {
-                e.printStackTrace();
+                LOGGER.severe("Couldn't close client socket:\n" + e.getMessage());
             }
         }
     }
 
-    private Map<Request, Runnable> getDefaultRequestHandler(ObjectOutputStream out, ObjectInputStream in)
+    private Map<Request, RequestRunnable> getDefaultRequestHandler(ObjectOutputStream out, ObjectInputStream in)
     {
         Map<Request, RequestRunnable> requestHandler = new HashMap<>();
 
