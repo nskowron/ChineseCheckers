@@ -6,6 +6,21 @@ public enum Request
     END_TURN,
     UPDATE,
     ACKNOWLEDGE,
+    ERROR
+    {
+        @Override
+        public void setData(Object data) throws ClassCastException
+        {
+            if(data instanceof String)
+            {
+                super.setData(data);
+            }
+            else
+            {
+                throw new ClassCastException("Request.ERROR only takes in string");
+            }
+        }
+    },
     READY
     {
         @Override
