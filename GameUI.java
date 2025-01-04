@@ -141,16 +141,13 @@ public class GameUI
 
         BorderPane borderPane = new BorderPane();
 
-        // Create an HBox for left and right sections
         HBox hbox = new HBox();
-        hbox.setSpacing(20);  // Set spacing between the left and right sections
-        hbox.setPadding(new Insets(0, 0, 0, 20)); // Set padding (left gap of 20px)
+        hbox.setSpacing(20);
+        hbox.setPadding(new Insets(0, 0, 0, 20));
         hbox.setStyle("-fx-background-color: rgb(50, 50, 50);");
 
-        // Set boardGridPane on the left and rightVbox on the right of the HBox
         hbox.getChildren().addAll(boardGridPane, rightVbox);
         
-        // Set the HBox as the center of the BorderPane
         borderPane.setCenter(hbox);
         borderPane.setStyle("-fx-background-color: rgb(50, 50, 50);");
 

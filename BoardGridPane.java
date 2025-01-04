@@ -8,7 +8,7 @@ import javafx.scene.layout.BackgroundFill;
 
 public class BoardGridPane extends GridPane {
 
-    private Map<String, String> starPositions = new HashMap<>(); // Set to store star positions
+    private Map<String, String> starPositions = new HashMap<>();
 
     public BoardGridPane() 
     {   
@@ -18,7 +18,6 @@ public class BoardGridPane extends GridPane {
         addStarPositions();
     }
 
-    // Method to add star positions (the positions where you want to place nodes)
     private void addStarPositions() 
     {
         starPositions.put("1,13", "1.1");
@@ -174,8 +173,9 @@ public class BoardGridPane extends GridPane {
 
         GraphicNode node = new GraphicNode(id, 0, 0, radius, Color.rgb(50, 50, 50), Color.GRAY);
 
-        add(node, col, row); // Place the node at (col, row)
-        UI.addNode(node); // Add to GameUI
+        add(node, col, row);
+
+        UI.addNode(node);
     }
 
     public void createBoard(double radius, GameUI UI) 
@@ -183,7 +183,7 @@ public class BoardGridPane extends GridPane {
         int rows = 20;
         int cols = 28;
 
-        setVgap(radius*1.2);  // Vertical gap
+        setVgap(radius*1.2);
         
         for (int row = 0; row < rows; row++) 
         {
