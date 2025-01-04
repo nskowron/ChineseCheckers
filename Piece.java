@@ -2,13 +2,18 @@ import java.io.Serializable;
 
 public class Piece implements Serializable
 {
-    private final int ownerID;
-    private Color color;
+    private final Player owner;
+    private final Color color;
 
-    public Piece(Color color)
+    public Piece(Color color, Player owner) throws IllegalArgumentException
     {
+        if(owner.getColor() != color)
+        {
+            throw new IllegalArgumentException("Player is of different color");
+        }
+
         this.color = color;
-        this.ownerID = -1;
+        this.owner = owner;
     }
 
     @Deprecated
@@ -18,9 +23,9 @@ public class Piece implements Serializable
     }
 
     @Deprecated
-    public int getOwner()
+    public Player getOwner()
     {
-        return ownerID;
+        return owner;
     }
 
     public Color getColor()
