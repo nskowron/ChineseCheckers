@@ -19,6 +19,11 @@ public class Player
             this.color = color;
         }
     }
+    
+    public int getId()
+    {
+        return id;
+    }
 
     public Color getColor()
     {

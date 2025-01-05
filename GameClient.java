@@ -1,18 +1,24 @@
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 
-public class GameClient implements Runnable {
-
-    private final String serverHost;
+public class GameClient implements Runnable 
+{
+    private final String serverAddress;
     private final int serverPort;
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
-    public GameClient(String serverHost, int serverPort) 
+    private GameUiController uiController;
+
+    private int playerId;
+    private boolean myTurn = false;
+
+    public GameClient(String serverAddress, int serverPort, GameUiController uiController) 
     {
-        this.serverHost = serverHost;
+        this.serverAddress = serverAddress;
         this.serverPort = serverPort;
+        this.uiController = uiController;
     }
 
     @Override
@@ -20,93 +26,66 @@ public class GameClient implements Runnable {
     {
         try 
         {
-            socket = new Socket(serverHost, serverPort);
+            socket = new Socket(serverAddress, serverPort);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            System.out.println("Connected to server!");
+            sendRequest(Request.GREET);
 
-            int playerId = (int) in.readObject();
-            System.out.println("Assigned Player ID: " + playerId);
-
-            listenForServerMessages();
-
-        } 
-        catch (Exception e) 
-        {
-            System.err.println("Error: " + e.getMessage());
-        } 
-        finally 
-        {
-            closeConnection();
-        }
-    }
-
-    public void sendMessage(Object message) 
-    {
-        try 
-        {
-            if (out != null) 
-            {
-                out.writeObject(message);
-                out.flush();
-            }
-        } 
-        catch (IOException e) 
-        {
-            System.err.println("Failed to send message: " + e.getMessage());
-        }
-    }
-
-    private void listenForServerMessages() 
-    {
-        try 
-        {
             while (true) 
             {
-                Object message = in.readObject();
-                
-                if (message instanceof Request) 
-                {
-                    Request request = (Request) message;
-                    handleRequest(request);
-                }
+                Request request = (Request) in.readObject();
+                handleServerResponse(request);
             }
         } 
-        catch (Exception e) 
+        catch (IOException | ClassNotFoundException e) 
         {
-            System.err.println("Connection closed or error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void handleRequest(Request request) 
+    public void sendRequest(Request request) throws IOException 
     {
-        //TODO Add more cases (or fix it being Switch (ifs are ugly af))
+        out.writeObject(request);
+        out.flush();
+    }
+
+    private void handleServerResponse(Request request) throws IOException 
+    {
+        //TODO REMEMBER TO USE unlock() FOR GAMEUI TO NOT IGNORE STUFF XD
         switch (request) 
         {
-            case UPDATE:
-                System.out.println("Update received: " + request.getData());
-                break;
             case GREET:
-                System.out.println("Greet received: " + request.getData());
+                Player player = (Player) request.getData();
+                playerId = player.getId();
+                break;
+            case GET_MOVES:
+                // Handle GET_MOVES response and update the UI
+                break;
+            case MOVE:
+                myTurn = false;
+                break;
+            case UPDATE:
+                // Handle game state update and notify GameUIController
                 break;
             default:
-                System.out.println("Unhandled request type: " + request);
+                // Handle other requests
                 break;
         }
     }
 
-    private void closeConnection() 
+    public int getPlayerId() 
     {
-        try 
-        {
-            if (socket != null) socket.close();
-            if (out != null) out.close();
-            if (in != null) in.close();
-        } 
-        catch (IOException e) 
-        {
-            System.err.println("Error closing connection: " + e.getMessage());
-        }
+        return playerId;
+    }
+
+    public void setTurn(boolean isTurn)
+    {
+        myTurn = isTurn;
+    }
+
+    public boolean isMyTurn() 
+    {
+        return myTurn;
     }
 }

@@ -46,6 +46,15 @@ public class GameUI
         return this.nodeSet;
     }
 
+    public Button getEndTurnButton()
+    {
+        return endTurnButton;
+    }
+    public Button getMoveButton()
+    {
+        return moveButton;
+    }
+
     public void addNode(GraphicNode node) 
     {
         this.nodeSet.add(node);
@@ -77,7 +86,7 @@ public class GameUI
         }
     }
 
-    public void setCurrentPlayerTurn(int playerTurn) 
+    public void setCurrentPlayerTurn(String playerTurn) 
     {
         currentPlayerLabel.setText("Current Player: " + playerTurn);
     }

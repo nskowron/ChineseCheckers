@@ -16,6 +16,7 @@ public class CheckersClient extends Application
 
         // Create and set up the controller
         GameUiController gameController = new GameUiController(gameUI, gameClient);
+        gameController.setup();
 
         // Show the stage
         Scene scene = new Scene(gameUI.getRoot(), 1250, 950);
