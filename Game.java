@@ -27,12 +27,6 @@ public class Game implements Serializable
         this.currentTurn = 0;
     }
 
-    @Deprecated
-    public Game(IValidityChecker checker, IBoard board) throws IllegalArgumentException
-    {
-        this(checker, board, null);
-    }
-
     public void move(Player player, Move move) throws IllegalAccessError
     {
         if(player.id != players.get(currentTurn).id)

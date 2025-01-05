@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntBinaryOperator;
 import java.util.logging.Logger;
 
 public class CheckersServer 
@@ -14,32 +15,83 @@ public class CheckersServer
     private static ArrayList<ServerPlayer> connectedClients = new ArrayList<>();
     private static Game game = null;
 
-    private static Object gameStarted = new Object();
+    private static Condition everyoneReady = new Condition();
 
     private static Logger LOGGER = Logger.getLogger("Server");
 
-    public static void main(String[] args) 
+    public static void main(final String[] args) 
     {
         try(ServerSocket serverSocket = new ServerSocket(PORT)) 
         {
             LOGGER.info("Server is running on port " + PORT + "...");
 
-            synchronized(gameStarted)
+            IValidityChecker validator = new ValidityChecker(); // Will depend on the argument
+            IBoard board = new Board();
+
+            synchronized(everyoneReady)
             {
+                Thread acceptance = new Thread(() -> {
+                    while(true)
+                    {
+                        if(connectedClients.size() < 6)
+                        {
+                            synchronized(connectedClients)
+                            {
+                                try
+                                {
+                                    Socket clientSocket = serverSocket.accept();
+                                    GamePlayer player = new GamePlayer(clientIdCounter);
+                                    ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, everyoneReady);
+                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, false);
+
+                                    everyoneReady.met = false;
+
+                                    connectedClients.add(connectedClient);
+                                    ++clientIdCounter;
+
+                                    Thread clientThread = new Thread(client);
+                                    clientThread.start();
+                                }
+                                catch(IOException e) {}
+                            }
+                        }
+                        else
+                        {
+                            try{ Thread.sleep(1000); }catch( InterruptedException e ){}
+                        }
+                    }
+                });
+                acceptance.start();
+
                 while(true)
                 {
-                    // TODO: wait for max 6 players and everyone to be ready
+                    while(everyoneReady.met == false)
+                    {
+                        try{ Thread.sleep(1000); }catch( InterruptedException e ){}
+                    }
+                    try
+                    {
+                        synchronized(connectedClients)
+                        {
+                            List<GamePlayer> players = new ArrayList<>();
+                            for(ServerPlayer client : connectedClients)
+                            {
+                                players.add((GamePlayer)client.gamePlayer);
+                            }
+                            game = new Game(validator, board, players);
+
+                            // Succeeded at creating game
+                            acceptance.stop();
+                            break;
+                        }
+                    }
+                    catch(IllegalArgumentException e) // Wrong no. of players
+                    {
+                        try{ Thread.sleep(1000); }catch( InterruptedException f ){}
+                    }
                 }
             }
-
-            // while (true) 
-            // {
-            //     Socket clientSocket = serverSocket.accept();
-            //     System.out.println("Client connected with ID: " + clientId);
-
-            //     // Create a new ClientHandler thread for each client
-            //     new Thread(new ClientHandler(clientSocket, game, clientId)).start();
-            // }
+            // ClientThreads wake up
         } 
         catch(IOException e) 
         {
@@ -54,26 +106,57 @@ public class CheckersServer
 
     public static void setReady(Boolean ready, int id)
     {
-        for(ServerPlayer client : connectedClients)
+        synchronized(connectedClients)
         {
-            if(client.id == id)
+            Boolean startGame = true;
+            for(ServerPlayer client : connectedClients)
             {
-                client.ready = ready;
-                return;
+                if(client.ready == false)
+                {
+                    startGame = false;
+                }
+
+                if(client.id == id)
+                {
+                    client.ready = ready;
+                    return;
+                }
+            }
+            everyoneReady.met = startGame;
+        }
+    }
+
+    public static void removeClient(int id) 
+    {
+        synchronized(connectedClients)
+        {
+            for(int i = 0; i < connectedClients.size(); ++i)
+            {
+                if(connectedClients.get(i).id == id)
+                {
+                    connectedClients.remove(i);
+                    // probably do sth else
+
+                    return;
+                }
             }
         }
     }
 
-    public static synchronized void removeClient(int id) 
+    public static void broadcastUpdate()
     {
-        for(int i = 0; i < connectedClients.size(); ++i)
+        synchronized(connectedClients)
         {
-            if(connectedClients.get(i).id == id)
+            for(ServerPlayer client : connectedClients)
             {
-                connectedClients.remove(i);
-                // probably do sth else
-
-                return;
+                try
+                {
+                    client.playerClient.sendUpdate();
+                }
+                catch(IOException e)
+                {
+                    LOGGER.severe("Client " + client.id + e.getMessage());
+                }
             }
         }
     }
