@@ -1,31 +1,30 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Logger;
 
 public class ClientHandler implements Runnable 
 {
+    private final int id;
     private final Socket clientSocket;
-    private final Game game;
     private final Player player;
+    private Object gameStarted;
 
     private Map<Request, RequestRunnable> requestHandler;
-    private Condition gameStarted;
-    private Boolean ready;
 
     private final Logger LOGGER;
 
-    public ClientHandler(Socket clientSocket, Game game, Player player, Condition gameStarted, Boolean ready) 
+    public ClientHandler(int id, Socket clientSocket, Player player, Object gameStarted) 
     {
+        this.id = id;
         this.clientSocket = clientSocket;
-        this.game = game;
         this.player = player;
         this.gameStarted = gameStarted;
-        this.ready = ready;
 
-        LOGGER = Logger.getLogger("Player " + player.id);
+        LOGGER = Logger.getLogger("ServerPlayer " + player.id);
 
         LOGGER.info("Client handler created");
     }
@@ -57,7 +56,7 @@ public class ClientHandler implements Runnable
             });
 
             readiness.start();
-            gameStarted.await();
+            synchronized(gameStarted){}
             readiness.stop(); // I know the risk
             
             while(true)
@@ -79,6 +78,7 @@ public class ClientHandler implements Runnable
         catch(EOFException e) 
         {
             LOGGER.info("Client disconnected");
+            CheckersServer.removeClient(id);
         } 
         catch(IOException | ClassNotFoundException e) 
         {
@@ -110,9 +110,13 @@ public class ClientHandler implements Runnable
         requestHandler.put(Request.END_TURN, (Request end_turn) -> {
             try
             {
-                game.endTurn(player);
                 Request ack = Request.ACKNOWLEDGE;
-                ack.setData(game.getCurrentTurn());
+                synchronized(CheckersServer.class)
+                {
+                    Game game = CheckersServer.getGame();
+                    game.endTurn(player);
+                    ack.setData(game.getCurrentTurn());
+                }
                 out.writeObject(ack);
             }
             catch(IllegalAccessError e)
@@ -123,25 +127,31 @@ public class ClientHandler implements Runnable
             }
         });
 
-        request.put(Request.UPDATE, (Request update) -> {
-            GameState state = new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin());
+        requestHandler.put(Request.UPDATE, (Request update) -> {
             Request ack = Request.ACKNOWLEDGE;
-            ack.setData(state);
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                ack.setData(new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin()));
+            }
             out.writeObject(ack);
         });
 
-        request.put(Request.ACKNOWLEDGE, (Request ack) -> {
+        requestHandler.put(Request.ACKNOWLEDGE, (Request ack) -> {
             in.flush();
         });
 
-        request.put(Request.ERROR, (Request error) -> {
-            LOGGER.severe(error.getData().getMessage());
+        requestHandler.put(Request.ERROR, (Request error) -> {
+            LOGGER.severe((Error)(error.getData()).getMessage());
         });
 
-        request.put(Request.READY, (Request ready) -> {
+        requestHandler.put(Request.READY, (Request ready) -> {
             if(ready.getData() != null)
             {
-                this.ready = (Boolean)ready.getData();
+                synchronized(CheckersServer.class)
+                {
+                    CheckersServer.setReady((Boolean)ready.getData(), id);
+                }
                 out.writeObject(Request.ACKNOWLEDGE);
             }
             else
@@ -152,16 +162,24 @@ public class ClientHandler implements Runnable
             }
         });
 
-        request.put(Request.GET_MOVES, (Request get) -> {
+        requestHandler.put(Request.GET_MOVES, (Request get) -> {
             Request moves = Request.ACKNOWLEDGE;
-            moves.setData(game.getValidMoves(player, (String)get.getData()));
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                moves.setData(game.getValidMoves(player, (String)get.getData()));
+            }
             out.writeObject(moves);
         });
 
-        request.put(Request.MOVE, (Request move) -> {
+        requestHandler.put(Request.MOVE, (Request move) -> {
             try
             {
-                game.move((Move)move.getData());
+                synchronized(CheckersServer.class)
+                {
+                    Game game = CheckersServer.getGame();
+                    game.move(player, (Move)move.getData());
+                }
                 out.writeObject(Request.ACKNOWLEDGE);
             }
             catch(IllegalAccessError e)

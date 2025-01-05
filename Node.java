@@ -16,7 +16,12 @@ public class Node implements Serializable
         this.id = id;
         this.colorStarting = colorStarting;
         this.colorTarget = colorTarget;
-        this.neighbors = new ArrayList<>(6, null);
+
+        this.neighbors = new ArrayList<>();
+        for(int i = 0; i < 6; ++i)
+        {
+            neighbors.add(null);
+        }
     }
 
     public Node(String id)

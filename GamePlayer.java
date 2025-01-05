@@ -1,8 +1,8 @@
 public class GamePlayer extends Player
 {
-    public GamePlayer(int id, Color color)
+    public GamePlayer(int id)
     {
-        super(id, color);
+        super(id);
     }
 
     public void setWon()

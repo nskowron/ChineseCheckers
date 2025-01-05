@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Board implements IBoard
@@ -14,10 +15,10 @@ public class Board implements IBoard
     }
 
     @Override
-    public void move(String startId, String endId) throws IllegalAccessError
+    public void move(Move move) throws IllegalAccessError
     {
-        Node start = findNodeById(startId);
-        Node end = findNodeById(endId);
+        Node start = findNodeById(move.startId);
+        Node end = findNodeById(move.endId);
 
         end.place(start.getPiece());
         start.take();

@@ -1,4 +1,5 @@
 import java.util.Map;
+import java.util.HashMap;
 
 public class GameState
 {
@@ -24,5 +25,6 @@ public class GameState
                 boardColors.put(node.getKey(), piece.getColor());
             }
         }
+        this.board = boardColors;
     }
 }

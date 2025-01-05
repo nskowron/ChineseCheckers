@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Game implements Serializable
 {
@@ -10,13 +11,18 @@ public class Game implements Serializable
 
     private int currentTurn;
 
-    public Game(IValidityChecker checker, IBoard board, List<GamePlayer> players) throws IllegalArgumentException
+    public Game(IValidityChecker checker, IBoard board, List<GamePlayer> gamePlayers) throws IllegalArgumentException
     {
+        List<Player> players = new ArrayList<>();
+        for(Player player : gamePlayers)
+        {
+            players.add(player);
+        }
         board.layPieces(players);
 
         this.board = board;
         this.checker = checker;
-        this.players = players;
+        this.players = gamePlayers;
 
         this.currentTurn = 0;
     }
@@ -29,7 +35,7 @@ public class Game implements Serializable
 
     public void move(Player player, Move move) throws IllegalAccessError
     {
-        if(move.playerId != players.get(currentTurn).id)
+        if(player.id != players.get(currentTurn).id)
         {
             throw new IllegalAccessError("It's not the player's turn");
         }
@@ -39,7 +45,7 @@ public class Game implements Serializable
         }
         else
         {
-            board.move(move.startId, move.endId);
+            board.move(move);
         }
     }
 
@@ -60,9 +66,9 @@ public class Game implements Serializable
             Node neighbor = beginNode.getNeighbors().get(i); // consider Node.getNeighbor(int)
             while(neighbor != null)
             {
-                if(checker.validMove(Move(beginId, neighbor.id)))
+                if(checker.validMove(new Move(beginId, neighbor.id)))
                 {
-                    endIds.add(neigbor.id);
+                    endIds.add(neighbor.id);
                     break;
                 }
                 neighbor = neighbor.getNeighbors().get(i);
