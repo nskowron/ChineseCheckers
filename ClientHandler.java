@@ -24,6 +24,8 @@ public class ClientHandler implements Runnable
         this.player = player;
         this.gameStarted = gameStarted;
 
+        this.requestHandler = null;
+
         LOGGER = Logger.getLogger("ServerPlayer " + player.id);
 
         LOGGER.info("Client handler created");
@@ -40,17 +42,21 @@ public class ClientHandler implements Runnable
             Thread readiness = new Thread(() -> {
                 while(true)
                 {
-                    Request request = (Request)in.readObject();
-                    if(request == Request.READY)
+                    try
                     {
-                        requestHandler.get(Request.READY).run(request);
+                        Request request = (Request)in.readObject();
+                        if(request == Request.READY)
+                        {
+                            requestHandler.get(Request.READY).run(request);
+                        }
+                        else
+                        {
+                            Request error = Request.ERROR;
+                            error.setData(new Error("Game has not started yet"));
+                            out.writeObject(error);
+                        }
                     }
-                    else
-                    {
-                        Request error = Request.ERROR;
-                        error.setData(new Error("Game has not started yet"));
-                        out.writeObject(error);
-                    }
+                    catch( IOException | ClassNotFoundException e ){ LOGGER.severe(e.getMessage()); }
                 }
             });
 
@@ -64,7 +70,10 @@ public class ClientHandler implements Runnable
                 RequestRunnable action = requestHandler.get(request);
                 if(action != null)
                 {
-                    action.run(request);
+                    synchronized(this)
+                    {
+                        action.run(request);
+                    }
                 }
                 else
                 {
@@ -96,27 +105,35 @@ public class ClientHandler implements Runnable
         }
     }
 
+    public void sendUpdate() throws IOException
+    {
+        if(requestHandler != null)
+        {
+            try{ requestHandler.get(Request.UPDATE).run(Request.UPDATE); }catch( ClassNotFoundException e){}
+        }
+    }
+
     private Map<Request, RequestRunnable> getDefaultRequestHandler(ObjectOutputStream out, ObjectInputStream in)
     {
         Map<Request, RequestRunnable> requestHandler = new HashMap<>();
 
         requestHandler.put(Request.GREET, (Request greet) -> {
-            Request ack = Request.ACKNOWLEDGE;
-            ack.setData(player);
-            out.writeObject(ack);
+            greet.setData(player);
+            out.writeObject(greet);
         });
 
         requestHandler.put(Request.END_TURN, (Request end_turn) -> {
             try
             {
-                Request ack = Request.ACKNOWLEDGE;
                 synchronized(CheckersServer.class)
                 {
                     Game game = CheckersServer.getGame();
                     game.endTurn(player);
-                    ack.setData(game.getCurrentTurn());
+                    end_turn.setData(game.getCurrentTurn());
                 }
-                out.writeObject(ack);
+                out.writeObject(end_turn);
+
+                CheckersServer.broadcastUpdate();
             }
             catch(IllegalAccessError e)
             {
@@ -127,21 +144,19 @@ public class ClientHandler implements Runnable
         });
 
         requestHandler.put(Request.UPDATE, (Request update) -> {
-            Request ack = Request.ACKNOWLEDGE;
             synchronized(CheckersServer.class)
             {
                 Game game = CheckersServer.getGame();
-                ack.setData(new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin()));
+                update.setData(new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin()));
             }
-            out.writeObject(ack);
+            out.writeObject(update);
         });
 
         requestHandler.put(Request.ACKNOWLEDGE, (Request ack) -> {
-            in.flush(); // cant do flush() on input, only output
         });
 
         requestHandler.put(Request.ERROR, (Request error) -> {
-            LOGGER.severe((Error)(error.getData()).getMessage());
+            LOGGER.severe(((Error)error.getData()).getMessage());
         });
 
         requestHandler.put(Request.READY, (Request ready) -> {
@@ -151,7 +166,7 @@ public class ClientHandler implements Runnable
                 {
                     CheckersServer.setReady((Boolean)ready.getData(), id);
                 }
-                out.writeObject(Request.ACKNOWLEDGE);
+                out.writeObject(ready);
             }
             else
             {
@@ -161,12 +176,11 @@ public class ClientHandler implements Runnable
             }
         });
 
-        requestHandler.put(Request.GET_MOVES, (Request get) -> {
-            Request moves = Request.ACKNOWLEDGE;
+        requestHandler.put(Request.GET_MOVES, (Request moves) -> {
             synchronized(CheckersServer.class)
             {
                 Game game = CheckersServer.getGame();
-                moves.setData(game.getValidMoves(player, (String)get.getData()));
+                moves.setData(game.getValidMoves(player, (String)moves.getData()));
             }
             out.writeObject(moves);
         });
@@ -179,7 +193,9 @@ public class ClientHandler implements Runnable
                     Game game = CheckersServer.getGame();
                     game.move(player, (Move)move.getData());
                 }
-                out.writeObject(Request.ACKNOWLEDGE);
+                out.writeObject(move);
+
+                CheckersServer.broadcastUpdate();
             }
             catch(IllegalAccessError e)
             {
