@@ -1,3 +1,5 @@
+package shared;
+
 public enum Request
 {
     // GREET

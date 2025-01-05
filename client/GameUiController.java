@@ -1,3 +1,8 @@
+package client;
+
+import shared.Move;
+import shared.Request;
+
 import java.io.*;
 
 public class GameUiController 

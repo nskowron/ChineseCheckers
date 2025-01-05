@@ -1,6 +1,10 @@
+package shared;
+
 import java.util.Map;
 
 import javafx.scene.paint.Color;
+import server.Node;
+import server.Piece;
 
 import java.util.HashMap;
 

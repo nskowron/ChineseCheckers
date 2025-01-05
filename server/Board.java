@@ -1,3 +1,8 @@
+package server;
+
+import shared.Move;
+import shared.Player;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

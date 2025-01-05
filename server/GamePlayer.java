@@ -1,3 +1,7 @@
+package server;
+
+import shared.Player;
+
 public class GamePlayer extends Player
 {
     public GamePlayer(int id)

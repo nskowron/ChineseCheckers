@@ -1,3 +1,7 @@
+package server;
+
+import shared.Player;
+
 import java.io.Serializable;
 
 import javafx.scene.paint.Color;

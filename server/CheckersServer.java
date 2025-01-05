@@ -1,3 +1,7 @@
+package server;
+
+import utils.Condition;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;

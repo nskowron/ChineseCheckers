@@ -1,3 +1,7 @@
+package server;
+
+import shared.Player;
+
 public class ServerPlayer
 {
     public final int id;

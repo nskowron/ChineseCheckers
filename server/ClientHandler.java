@@ -1,3 +1,7 @@
+package server;
+
+import shared.*;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;

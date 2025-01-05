@@ -1,3 +1,5 @@
+package utils;
+
 public class Condition
 {
     public Boolean met;

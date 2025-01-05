@@ -1,3 +1,8 @@
+package client;
+
+import shared.Player;
+import shared.Request;
+
 import java.io.*;
 import java.net.*;
 

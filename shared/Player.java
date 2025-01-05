@@ -1,3 +1,5 @@
+package shared;
+
 import javafx.scene.paint.Color;
 
 public class Player
