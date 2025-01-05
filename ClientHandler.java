@@ -31,7 +31,6 @@ public class ClientHandler implements Runnable
         LOGGER.info("Client handler created");
     }
     
-
     @Override
     public void run() 
     {
