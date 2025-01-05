@@ -1,4 +1,7 @@
 import java.util.Map;
+
+import javafx.scene.paint.Color;
+
 import java.util.HashMap;
 
 public class GameState
@@ -18,7 +21,7 @@ public class GameState
             Piece piece = node.getValue().getPiece();
             if(piece == null)
             {
-                boardColors.put(node.getKey(), Color.DEFAULT);
+                boardColors.put(node.getKey(), Color.rgb(50, 50, 50));
             }
             else
             {

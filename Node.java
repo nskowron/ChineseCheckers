@@ -2,6 +2,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.paint.Color;
+
 public class Node implements Serializable
 {
     public final int[] id;
@@ -26,7 +28,7 @@ public class Node implements Serializable
 
     public Node(int[] id)
     {
-        this(id, Color.DEFAULT, Color.DEFAULT);
+        this(id, Color.rgb(50, 50, 50), Color.rgb(50, 50, 50));
     }
 
     public void addNeighbor(int idx, Node neighbor) 

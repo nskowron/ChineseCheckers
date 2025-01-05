@@ -1,3 +1,5 @@
+import javafx.scene.paint.Color;
+
 public class Player
 {
     protected final int id;
@@ -8,13 +10,13 @@ public class Player
     public Player(int id)
     {
         this.id = id;
-        this.color = Color.DEFAULT;
+        this.color = Color.rgb(50, 50, 50);
         this.won = false;
     }
 
     public void setColor(Color color)
     {
-        if(this.color == Color.DEFAULT)
+        if(this.color == Color.rgb(50, 50, 50))
         {
             this.color = color;
         }

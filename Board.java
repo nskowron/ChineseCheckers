@@ -1,6 +1,5 @@
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class Board implements IBoard
@@ -12,6 +11,7 @@ public class Board implements IBoard
         this.nodes = new HashMap<>();
 
         //TODO: Implement node linking(later)
+        
     }
 
     @Override

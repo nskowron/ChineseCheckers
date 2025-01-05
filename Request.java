@@ -1,5 +1,3 @@
-import java.nio.ReadOnlyBufferException;
-
 public enum Request
 {
     // GREET

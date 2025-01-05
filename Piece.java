@@ -1,5 +1,7 @@
 import java.io.Serializable;
 
+import javafx.scene.paint.Color;
+
 public class Piece implements Serializable
 {
     private final Player owner;

@@ -2,8 +2,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.logging.Logger;
 
 public class ClientHandler implements Runnable 
