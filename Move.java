@@ -4,8 +4,6 @@ public class Move implements Serializable
 {
     public final int[] startId;
     public final int[] endId;
-
-    //TODO ADD VALIDATION
     
     public Move(int[] beginId, int[] endId)
     {

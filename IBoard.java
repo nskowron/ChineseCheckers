@@ -5,7 +5,7 @@ import java.util.Map;
 public interface IBoard extends Serializable
 {
     public void move(Move move) throws IllegalAccessError;
-    public Map<String, Node> getNodes();
-    public Node findNodeById(String id);
+    public Map<int[], Node> getNodes();
+    public Node findNodeById(int[] id);
     public void layPieces(List<Player> players) throws IllegalArgumentException;
 }

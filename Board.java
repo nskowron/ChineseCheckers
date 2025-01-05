@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Board implements IBoard
 {
-    private Map<String, Node> nodes;
+    private Map<int[], Node> nodes;
 
     public Board() 
     {
@@ -25,13 +25,13 @@ public class Board implements IBoard
     }
 
     @Override
-    public Node findNodeById(String id)
+    public Node findNodeById(int[] id)
     {
         return nodes.get(id);
     }
 
     @Override
-    public Map<String, Node> getNodes() 
+    public Map<int[], Node> getNodes() 
     {
         return nodes;
     }

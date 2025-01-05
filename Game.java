@@ -29,7 +29,7 @@ public class Game implements Serializable
 
     public void move(Player player, Move move) throws IllegalAccessError
     {
-        if(player.id != players.get(currentTurn).id)
+        if(player.getId() != players.get(currentTurn).getId())
         {
             throw new IllegalAccessError("It's not the player's turn");
         }
@@ -43,9 +43,9 @@ public class Game implements Serializable
         }
     }
 
-    public List<String> getValidMoves(Player player, String beginId)
+    public List<int[]> getValidMoves(Player player, int[] beginId)
     {
-        List<String> endIds = new ArrayList<>();
+        List<int[]> endIds = new ArrayList<>();
 
         // TODO: add checking for turn?
 
@@ -74,7 +74,7 @@ public class Game implements Serializable
 
     public void endTurn(Player player) throws IllegalAccessError
     {
-        if(player.id == players.get(currentTurn).id)
+        if(player.getId() == players.get(currentTurn).getId())
         {
             for(int i = 1; i < players.size(); ++i)
             {

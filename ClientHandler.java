@@ -17,6 +17,8 @@ public class ClientHandler implements Runnable
 
     private final Logger LOGGER;
 
+    private boolean running;
+
     public ClientHandler(int id, Socket clientSocket, Player player, Object gameStarted) 
     {
         this.id = id;
@@ -26,7 +28,9 @@ public class ClientHandler implements Runnable
 
         this.requestHandler = null;
 
-        LOGGER = Logger.getLogger("ServerPlayer " + player.id);
+        this.running = false;
+
+        LOGGER = Logger.getLogger("ServerPlayer " + player.getId());
 
         LOGGER.info("Client handler created");
     }
@@ -34,13 +38,14 @@ public class ClientHandler implements Runnable
     @Override
     public void run() 
     {
+        running = true;
         try(ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) 
         {
             requestHandler = getDefaultRequestHandler(out, in);
 
             Thread readiness = new Thread(() -> {
-                while(true)
+                while(running)
                 {
                     try
                     {
@@ -56,7 +61,14 @@ public class ClientHandler implements Runnable
                             out.writeObject(error);
                         }
                     }
-                    catch( IOException | ClassNotFoundException e ){ LOGGER.severe(e.getMessage()); }
+                    catch(EOFException e)
+                    {
+                        disconnect(true);
+                    }
+                    catch(IOException | ClassNotFoundException e)
+                    {
+                        disconnect(false);
+                    }
                 }
             });
 
@@ -64,7 +76,7 @@ public class ClientHandler implements Runnable
             synchronized(gameStarted){}
             readiness.stop(); // I know the risk
             
-            while(true)
+            while(running)
             {
                 Request request = (Request)in.readObject();
                 RequestRunnable action = requestHandler.get(request);
@@ -82,27 +94,34 @@ public class ClientHandler implements Runnable
                     out.writeObject(error);
                 }
             }
-        } 
-        catch(EOFException e) 
+        }
+        catch(EOFException e)
         {
-            LOGGER.info("Client disconnected");
-            CheckersServer.removeClient(id);
-        } 
+            disconnect(true);
+        }
         catch(IOException | ClassNotFoundException e) 
         {
-            LOGGER.severe("Communication error:\n" + e.getMessage());
-        } 
-        finally 
-        {
-            try 
-            {
-                clientSocket.close();
-            } 
-            catch (IOException e) 
-            {
-                LOGGER.severe("Couldn't close client socket:\n" + e.getMessage());
-            }
+            disconnect(false);
         }
+
+        LOGGER.info("ClientHandler died");
+    }
+
+    public void disconnect(boolean ok)
+    {
+        running = false;
+
+        if(ok)
+        {
+            LOGGER.info("Client disconnected");
+        }
+        else
+        {
+            LOGGER.severe("Connection error!");
+        }
+        
+        CheckersServer.removeClient(id);
+        try{ clientSocket.close(); }catch( IOException e ){}
     }
 
     public void sendUpdate() throws IOException
@@ -180,7 +199,7 @@ public class ClientHandler implements Runnable
             synchronized(CheckersServer.class)
             {
                 Game game = CheckersServer.getGame();
-                moves.setData(game.getValidMoves(player, (String)moves.getData()));
+                moves.setData(game.getValidMoves(player, (int[])moves.getData()));
             }
             out.writeObject(moves);
         });

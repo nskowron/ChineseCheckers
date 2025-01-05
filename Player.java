@@ -1,6 +1,6 @@
 public class Player
 {
-    public final int id;
+    protected final int id;
     protected Color color;
 
     protected boolean won;

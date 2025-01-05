@@ -4,14 +4,14 @@ import java.util.List;
 
 public class Node implements Serializable
 {
-    public final String id;
+    public final int[] id;
     public final Color colorStarting;
     public final Color colorTarget;
 
     private Piece placeholder;
     private List<Node> neighbors;
 
-    public Node(String id, Color colorStarting, Color colorTarget) 
+    public Node(int[] id, Color colorStarting, Color colorTarget) 
     {
         this.id = id;
         this.colorStarting = colorStarting;
@@ -24,7 +24,7 @@ public class Node implements Serializable
         }
     }
 
-    public Node(String id)
+    public Node(int[] id)
     {
         this(id, Color.DEFAULT, Color.DEFAULT);
     }
@@ -47,8 +47,7 @@ public class Node implements Serializable
         return neighbors;
     }
 
-    @Deprecated
-    public String getID()
+    public int[] getID()
     {
         return id;
     }

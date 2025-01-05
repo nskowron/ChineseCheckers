@@ -35,11 +35,13 @@ public class CheckersServer
                     {
                         if(connectedClients.size() < 6)
                         {
-                            synchronized(connectedClients)
+                            try
                             {
-                                try
+                                Socket clientSocket = serverSocket.accept();
+                                LOGGER.info("New socket accepted");
+
+                                synchronized(connectedClients)
                                 {
-                                    Socket clientSocket = serverSocket.accept();
                                     GamePlayer player = new GamePlayer(clientIdCounter);
                                     ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, everyoneReady);
                                     ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, false);
@@ -52,8 +54,8 @@ public class CheckersServer
                                     Thread clientThread = new Thread(client);
                                     clientThread.start();
                                 }
-                                catch(IOException e) {}
                             }
+                            catch(IOException e){ LOGGER.severe(e.getMessage()); }
                         }
                         else
                         {
@@ -91,6 +93,7 @@ public class CheckersServer
                     }
                 }
             }
+            LOGGER.info("Game has started");
             // ClientThreads wake up
         } 
         catch(IOException e) 
@@ -135,6 +138,7 @@ public class CheckersServer
                 if(connectedClients.get(i).id == id)
                 {
                     connectedClients.remove(i);
+                    LOGGER.info("Client " + i + " removed.");
                     // probably do sth else
 
                     return;
