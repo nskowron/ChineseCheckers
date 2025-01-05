@@ -16,12 +16,6 @@ public class Piece implements Serializable
         this.owner = owner;
     }
 
-    @Deprecated
-    public Piece(int ownerID)
-    {
-        this.owner = ownerID;
-    }
-
     public Player getOwner()
     {
         return owner;

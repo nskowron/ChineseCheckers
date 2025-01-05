@@ -138,11 +138,10 @@ public class ClientHandler implements Runnable
         });
 
         requestHandler.put(Request.ACKNOWLEDGE, (Request ack) -> {
-            in.flush();
         });
 
         requestHandler.put(Request.ERROR, (Request error) -> {
-            LOGGER.severe((Error)(error.getData()).getMessage());
+            LOGGER.severe(((Error)error.getData()).getMessage());
         });
 
         requestHandler.put(Request.READY, (Request ready) -> {
