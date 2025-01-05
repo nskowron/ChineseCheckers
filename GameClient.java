@@ -9,16 +9,15 @@ public class GameClient implements Runnable
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
-    private GameUiController uiController;
+    private GameUiController uiController; // FIX IT
 
     private int playerId;
     private boolean myTurn = false;
 
-    public GameClient(String serverAddress, int serverPort, GameUiController uiController) 
+    public GameClient(String serverAddress, int serverPort) 
     {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
-        this.uiController = uiController;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class GameClient implements Runnable
 
     private void handleServerResponse(Request request) throws IOException 
     {
-        //TODO REMEMBER TO USE unlock() FOR GAMEUI TO NOT IGNORE STUFF XD
+        //TODO REMEMBER TO USE unlock() FOR GAME UI AFTER EACH MOVE, UI IS LOCKED EVERY TIME GET MOVES OR MOVE IS SENT
         switch (request) 
         {
             case GREET:
