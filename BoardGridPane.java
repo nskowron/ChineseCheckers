@@ -1,14 +1,15 @@
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 
-public class BoardGridPane extends GridPane {
-
-    private Map<String, String> starPositions = new HashMap<>();
+public class BoardGridPane extends GridPane 
+{
+    private Map<int[], Pair<int[], Color>> starPositions = new HashMap<>();
 
     public BoardGridPane() 
     {   
@@ -20,158 +21,163 @@ public class BoardGridPane extends GridPane {
 
     private void addStarPositions() 
     {
-        starPositions.put("1,13", "1.1");
+        starPositions.put(new int[]{1, 13}, new Pair<>(new int[]{1, 1}, Color.CYAN));
 
-        starPositions.put("2,12", "2.1");
-        starPositions.put("2,14", "2.2");
+        starPositions.put(new int[]{2, 12}, new Pair<>(new int[]{2, 1}, Color.CYAN));
+        starPositions.put(new int[]{2, 14}, new Pair<>(new int[]{2, 2}, Color.CYAN));
+        
+        starPositions.put(new int[]{3, 11}, new Pair<>(new int[]{3, 1}, Color.CYAN));
+        starPositions.put(new int[]{3, 13}, new Pair<>(new int[]{3, 2}, Color.CYAN));
+        starPositions.put(new int[]{3, 15}, new Pair<>(new int[]{3, 3}, Color.CYAN));
+        
+        starPositions.put(new int[]{4, 10}, new Pair<>(new int[]{4, 1}, Color.CYAN));
+        starPositions.put(new int[]{4, 12}, new Pair<>(new int[]{4, 2}, Color.CYAN));
+        starPositions.put(new int[]{4, 14}, new Pair<>(new int[]{4, 3}, Color.CYAN));
+        starPositions.put(new int[]{4, 16}, new Pair<>(new int[]{4, 4}, Color.CYAN));
 
-        starPositions.put("3,11", "3.1");
-        starPositions.put("3,13", "3.2");
-        starPositions.put("3,15", "3.3");
+        starPositions.put(new int[]{5, 1}, new Pair<>(new int[]{5, 1}, Color.BLUE));
+        starPositions.put(new int[]{5, 3}, new Pair<>(new int[]{5, 2}, Color.BLUE));
+        starPositions.put(new int[]{5, 5}, new Pair<>(new int[]{5, 3}, Color.BLUE));
+        starPositions.put(new int[]{5, 7}, new Pair<>(new int[]{5, 4}, Color.BLUE));
+        starPositions.put(new int[]{5, 9}, new Pair<>(new int[]{5, 5}, Color.GREY));
+        starPositions.put(new int[]{5, 11}, new Pair<>(new int[]{5, 6}, Color.GREY));
+        starPositions.put(new int[]{5, 13}, new Pair<>(new int[]{5, 7}, Color.GREY));
+        starPositions.put(new int[]{5, 15}, new Pair<>(new int[]{5, 8}, Color.GREY));
+        starPositions.put(new int[]{5, 17}, new Pair<>(new int[]{5, 9}, Color.GREY));
+        starPositions.put(new int[]{5, 19}, new Pair<>(new int[]{5, 10}, Color.GREEN));
+        starPositions.put(new int[]{5, 21}, new Pair<>(new int[]{5, 11}, Color.GREEN));
+        starPositions.put(new int[]{5, 23}, new Pair<>(new int[]{5, 12}, Color.GREEN));
+        starPositions.put(new int[]{5, 25}, new Pair<>(new int[]{5, 13}, Color.GREEN));
+        
+        starPositions.put(new int[]{6, 2}, new Pair<>(new int[]{6, 1}, Color.BLUE));
+        starPositions.put(new int[]{6, 4}, new Pair<>(new int[]{6, 2}, Color.BLUE));
+        starPositions.put(new int[]{6, 6}, new Pair<>(new int[]{6, 3}, Color.BLUE));
+        starPositions.put(new int[]{6, 8}, new Pair<>(new int[]{6, 4}, Color.GREY));
+        starPositions.put(new int[]{6, 10}, new Pair<>(new int[]{6, 5}, Color.GREY));
+        starPositions.put(new int[]{6, 12}, new Pair<>(new int[]{6, 6}, Color.GREY));
+        starPositions.put(new int[]{6, 14}, new Pair<>(new int[]{6, 7}, Color.GREY));
+        starPositions.put(new int[]{6, 16}, new Pair<>(new int[]{6, 8}, Color.GREY));
+        starPositions.put(new int[]{6, 18}, new Pair<>(new int[]{6, 9}, Color.GREY));
+        starPositions.put(new int[]{6, 20}, new Pair<>(new int[]{6, 10}, Color.GREEN));
+        starPositions.put(new int[]{6, 22}, new Pair<>(new int[]{6, 11}, Color.GREEN));
+        starPositions.put(new int[]{6, 24}, new Pair<>(new int[]{6, 12}, Color.GREEN));
+        
+        starPositions.put(new int[]{7, 3}, new Pair<>(new int[]{7, 1}, Color.BLUE));
+        starPositions.put(new int[]{7, 5}, new Pair<>(new int[]{7, 2}, Color.BLUE));
+        starPositions.put(new int[]{7, 7}, new Pair<>(new int[]{7, 3}, Color.GREY));
+        starPositions.put(new int[]{7, 9}, new Pair<>(new int[]{7, 4}, Color.GREY));
+        starPositions.put(new int[]{7, 11}, new Pair<>(new int[]{7, 5}, Color.GREY));
+        starPositions.put(new int[]{7, 13}, new Pair<>(new int[]{7, 6}, Color.GREY));
+        starPositions.put(new int[]{7, 15}, new Pair<>(new int[]{7, 7}, Color.GREY));
+        starPositions.put(new int[]{7, 17}, new Pair<>(new int[]{7, 8}, Color.GREY));
+        starPositions.put(new int[]{7, 19}, new Pair<>(new int[]{7, 9}, Color.GREY));
+        starPositions.put(new int[]{7, 21}, new Pair<>(new int[]{7, 10}, Color.GREEN));
+        starPositions.put(new int[]{7, 23}, new Pair<>(new int[]{7, 11}, Color.GREEN));
+        
+        starPositions.put(new int[]{8, 4}, new Pair<>(new int[]{8, 1}, Color.BLUE));
+        starPositions.put(new int[]{8, 6}, new Pair<>(new int[]{8, 2}, Color.GREY));
+        starPositions.put(new int[]{8, 8}, new Pair<>(new int[]{8, 3}, Color.GREY));
+        starPositions.put(new int[]{8, 10}, new Pair<>(new int[]{8, 4}, Color.GREY));
+        starPositions.put(new int[]{8, 12}, new Pair<>(new int[]{8, 5}, Color.GREY));
+        starPositions.put(new int[]{8, 14}, new Pair<>(new int[]{8, 6}, Color.GREY));
+        starPositions.put(new int[]{8, 16}, new Pair<>(new int[]{8, 7}, Color.GREY));
+        starPositions.put(new int[]{8, 18}, new Pair<>(new int[]{8, 8}, Color.GREY));
+        starPositions.put(new int[]{8, 20}, new Pair<>(new int[]{8, 9}, Color.GREY));
+        starPositions.put(new int[]{8, 22}, new Pair<>(new int[]{8, 10}, Color.GREEN));
 
-        starPositions.put("4,10", "4.1");
-        starPositions.put("4,12", "4.2");
-        starPositions.put("4,14", "4.3");
-        starPositions.put("4,16", "4.4");
+        starPositions.put(new int[]{9, 5}, new Pair<>(new int[]{9, 1}, Color.GREY));
+        starPositions.put(new int[]{9, 7}, new Pair<>(new int[]{9, 2}, Color.GREY));
+        starPositions.put(new int[]{9, 9}, new Pair<>(new int[]{9, 3}, Color.GREY));
+        starPositions.put(new int[]{9, 11}, new Pair<>(new int[]{9, 4}, Color.GREY));
+        starPositions.put(new int[]{9, 13}, new Pair<>(new int[]{9, 5}, Color.GREY));
+        starPositions.put(new int[]{9, 15}, new Pair<>(new int[]{9, 6}, Color.GREY));
+        starPositions.put(new int[]{9, 17}, new Pair<>(new int[]{9, 7}, Color.GREY));
+        starPositions.put(new int[]{9, 19}, new Pair<>(new int[]{9, 8}, Color.GREY));
+        starPositions.put(new int[]{9, 21}, new Pair<>(new int[]{9, 9}, Color.GREY));
 
-        starPositions.put("5,1", "5.1");
-        starPositions.put("5,3", "5.2");
-        starPositions.put("5,5", "5.3");
-        starPositions.put("5,7", "5.4");
-        starPositions.put("5,9", "5.5");
-        starPositions.put("5,11", "5.6");
-        starPositions.put("5,13", "5.7");
-        starPositions.put("5,15", "5.8");
-        starPositions.put("5,17", "5.9");
-        starPositions.put("5,19", "5.10");
-        starPositions.put("5,21", "5.11");
-        starPositions.put("5,23", "5.12");
-        starPositions.put("5,25", "5.13");
+        starPositions.put(new int[]{10, 4}, new Pair<>(new int[]{10, 1}, Color.YELLOW));
+        starPositions.put(new int[]{10, 6}, new Pair<>(new int[]{10, 2}, Color.GREY));
+        starPositions.put(new int[]{10, 8}, new Pair<>(new int[]{10, 3}, Color.GREY));
+        starPositions.put(new int[]{10, 10}, new Pair<>(new int[]{10, 4}, Color.GREY));
+        starPositions.put(new int[]{10, 12}, new Pair<>(new int[]{10, 5}, Color.GREY));
+        starPositions.put(new int[]{10, 14}, new Pair<>(new int[]{10, 6}, Color.GREY));
+        starPositions.put(new int[]{10, 16}, new Pair<>(new int[]{10, 7}, Color.GREY));
+        starPositions.put(new int[]{10, 18}, new Pair<>(new int[]{10, 8}, Color.GREY));
+        starPositions.put(new int[]{10, 20}, new Pair<>(new int[]{10, 9}, Color.GREY));
+        starPositions.put(new int[]{10, 22}, new Pair<>(new int[]{10, 10}, Color.RED));
 
-        starPositions.put("6,2", "6.1");
-        starPositions.put("6,4", "6.2");
-        starPositions.put("6,6", "6.3");
-        starPositions.put("6,8", "6.4");
-        starPositions.put("6,10", "6.5");
-        starPositions.put("6,12", "6.6");
-        starPositions.put("6,14", "6.7");
-        starPositions.put("6,16", "6.8");
-        starPositions.put("6,18", "6.9");
-        starPositions.put("6,20", "6.10");
-        starPositions.put("6,22", "6.11");
-        starPositions.put("6,24", "6.12");
+        starPositions.put(new int[]{11, 3}, new Pair<>(new int[]{11, 1}, Color.YELLOW));
+        starPositions.put(new int[]{11, 5}, new Pair<>(new int[]{11, 2}, Color.YELLOW));
+        starPositions.put(new int[]{11, 7}, new Pair<>(new int[]{11, 3}, Color.GREY));
+        starPositions.put(new int[]{11, 9}, new Pair<>(new int[]{11, 4}, Color.GREY));
+        starPositions.put(new int[]{11, 11}, new Pair<>(new int[]{11, 5}, Color.GREY));
+        starPositions.put(new int[]{11, 13}, new Pair<>(new int[]{11, 6}, Color.GREY));
+        starPositions.put(new int[]{11, 15}, new Pair<>(new int[]{11, 7}, Color.GREY));
+        starPositions.put(new int[]{11, 17}, new Pair<>(new int[]{11, 8}, Color.GREY));
+        starPositions.put(new int[]{11, 19}, new Pair<>(new int[]{11, 9}, Color.GREY));
+        starPositions.put(new int[]{11, 21}, new Pair<>(new int[]{11, 10}, Color.RED));
+        starPositions.put(new int[]{11, 23}, new Pair<>(new int[]{11, 11}, Color.RED));
 
-        starPositions.put("7,3", "7.1");
-        starPositions.put("7,5", "7.2");
-        starPositions.put("7,7", "7.3");
-        starPositions.put("7,9", "7.4");
-        starPositions.put("7,11", "7.5");
-        starPositions.put("7,13", "7.6");
-        starPositions.put("7,15", "7.7");
-        starPositions.put("7,17", "7.8");
-        starPositions.put("7,19", "7.9");
-        starPositions.put("7,21", "7.10");
-        starPositions.put("7,23", "7.11");
+        starPositions.put(new int[]{12, 2}, new Pair<>(new int[]{12, 1}, Color.YELLOW));
+        starPositions.put(new int[]{12, 4}, new Pair<>(new int[]{12, 2}, Color.YELLOW));
+        starPositions.put(new int[]{12, 6}, new Pair<>(new int[]{12, 3}, Color.YELLOW));
+        starPositions.put(new int[]{12, 8}, new Pair<>(new int[]{12, 4}, Color.GREY));
+        starPositions.put(new int[]{12, 10}, new Pair<>(new int[]{12, 5}, Color.GREY));
+        starPositions.put(new int[]{12, 12}, new Pair<>(new int[]{12, 6}, Color.GREY));
+        starPositions.put(new int[]{12, 14}, new Pair<>(new int[]{12, 7}, Color.GREY));
+        starPositions.put(new int[]{12, 16}, new Pair<>(new int[]{12, 8}, Color.GREY));
+        starPositions.put(new int[]{12, 18}, new Pair<>(new int[]{12, 9}, Color.GREY));
+        starPositions.put(new int[]{12, 20}, new Pair<>(new int[]{12, 10}, Color.RED));
+        starPositions.put(new int[]{12, 22}, new Pair<>(new int[]{12, 11}, Color.RED));
+        starPositions.put(new int[]{12, 24}, new Pair<>(new int[]{12, 12}, Color.RED));
 
-        starPositions.put("8,4", "8.1");
-        starPositions.put("8,6", "8.2");
-        starPositions.put("8,8", "8.3");
-        starPositions.put("8,10", "8.4");
-        starPositions.put("8,12", "8.5");
-        starPositions.put("8,14", "8.6");
-        starPositions.put("8,16", "8.7");
-        starPositions.put("8,18", "8.8");
-        starPositions.put("8,20", "8.9");
-        starPositions.put("8,22", "8.10");
+        starPositions.put(new int[]{13, 1}, new Pair<>(new int[]{13, 1}, Color.YELLOW));
+        starPositions.put(new int[]{13, 3}, new Pair<>(new int[]{13, 2}, Color.YELLOW));
+        starPositions.put(new int[]{13, 5}, new Pair<>(new int[]{13, 3}, Color.YELLOW));
+        starPositions.put(new int[]{13, 7}, new Pair<>(new int[]{13, 4}, Color.YELLOW));
+        starPositions.put(new int[]{13, 9}, new Pair<>(new int[]{13, 5}, Color.GREY));
+        starPositions.put(new int[]{13, 11}, new Pair<>(new int[]{13, 6}, Color.GREY));
+        starPositions.put(new int[]{13, 13}, new Pair<>(new int[]{13, 7}, Color.GREY));
+        starPositions.put(new int[]{13, 15}, new Pair<>(new int[]{13, 8}, Color.GREY));
+        starPositions.put(new int[]{13, 17}, new Pair<>(new int[]{13, 9}, Color.GREY));
+        starPositions.put(new int[]{13, 19}, new Pair<>(new int[]{13, 10}, Color.RED));
+        starPositions.put(new int[]{13, 21}, new Pair<>(new int[]{13, 11}, Color.RED));
+        starPositions.put(new int[]{13, 23}, new Pair<>(new int[]{13, 12}, Color.RED));
+        starPositions.put(new int[]{13, 25}, new Pair<>(new int[]{13, 13}, Color.RED));
 
-        starPositions.put("9,5", "9.1");
-        starPositions.put("9,7", "9.2");
-        starPositions.put("9,9", "9.3");
-        starPositions.put("9,11", "9.4");
-        starPositions.put("9,13", "9.5");
-        starPositions.put("9,15", "9.6");
-        starPositions.put("9,17", "9.7");
-        starPositions.put("9,19", "9.8");
-        starPositions.put("9,21", "9.9");
+        starPositions.put(new int[]{14, 10}, new Pair<>(new int[]{14, 1}, Color.MAGENTA));
+        starPositions.put(new int[]{14, 12}, new Pair<>(new int[]{14, 2}, Color.MAGENTA));
+        starPositions.put(new int[]{14, 14}, new Pair<>(new int[]{14, 3}, Color.MAGENTA));
+        starPositions.put(new int[]{14, 16}, new Pair<>(new int[]{14, 4}, Color.MAGENTA));
 
-        starPositions.put("10,4", "10.1");
-        starPositions.put("10,6", "10.2");
-        starPositions.put("10,8", "10.3");
-        starPositions.put("10,10", "10.4");
-        starPositions.put("10,12", "10.5");
-        starPositions.put("10,14", "10.6");
-        starPositions.put("10,16", "10.7");
-        starPositions.put("10,18", "10.8");
-        starPositions.put("10,20", "10.9");
-        starPositions.put("10,22", "10.10");
+        starPositions.put(new int[]{15, 11}, new Pair<>(new int[]{15, 1}, Color.MAGENTA));
+        starPositions.put(new int[]{15, 13}, new Pair<>(new int[]{15, 2}, Color.MAGENTA));
+        starPositions.put(new int[]{15, 15}, new Pair<>(new int[]{15, 3}, Color.MAGENTA));
 
-        starPositions.put("11,3", "11.1");
-        starPositions.put("11,5", "11.2");
-        starPositions.put("11,7", "11.3");
-        starPositions.put("11,9", "11.4");
-        starPositions.put("11,11", "11.5");
-        starPositions.put("11,13", "11.6");
-        starPositions.put("11,15", "11.7");
-        starPositions.put("11,17", "11.8");
-        starPositions.put("11,19", "11.9");
-        starPositions.put("11,21", "11.10");
-        starPositions.put("11,23", "11.11");
+        starPositions.put(new int[]{16, 12}, new Pair<>(new int[]{16, 1}, Color.MAGENTA));
+        starPositions.put(new int[]{16, 14}, new Pair<>(new int[]{16, 2}, Color.MAGENTA));
 
-        starPositions.put("12,2", "12.1");
-        starPositions.put("12,4", "12.2");
-        starPositions.put("12,6", "12.3");
-        starPositions.put("12,8", "12.4");
-        starPositions.put("12,10", "12.5");
-        starPositions.put("12,12", "12.6");
-        starPositions.put("12,14", "12.7");
-        starPositions.put("12,16", "12.8");
-        starPositions.put("12,18", "12.9");
-        starPositions.put("12,20", "12.10");
-        starPositions.put("12,22", "12.11");
-        starPositions.put("12,24", "12.12");
-
-        starPositions.put("13,1", "13.1");
-        starPositions.put("13,3", "13.2");
-        starPositions.put("13,5", "13.3");
-        starPositions.put("13,7", "13.4");
-        starPositions.put("13,9", "13.5");
-        starPositions.put("13,11", "13.6");
-        starPositions.put("13,13", "13.7");
-        starPositions.put("13,15", "13.8");
-        starPositions.put("13,17", "13.9");
-        starPositions.put("13,19", "13.10");
-        starPositions.put("13,21", "13.11");
-        starPositions.put("13,23", "13.12");
-        starPositions.put("13,25", "13.13");
-
-        starPositions.put("14,10", "14.1");
-        starPositions.put("14,12", "14.2");
-        starPositions.put("14,14", "14.3");
-        starPositions.put("14,16", "14.4");
-
-        starPositions.put("15,11", "15.1");
-        starPositions.put("15,13", "15.2");
-        starPositions.put("15,15", "15.3");
-
-        starPositions.put("16,12", "16.1");
-        starPositions.put("16,14", "16.2");
-
-        starPositions.put("17,13", "17.1");
-
+        starPositions.put(new int[]{17, 13}, new Pair<>(new int[]{17, 1}, Color.MAGENTA));
     }
 
     public void putGraphicNode(int row, int col, double radius, GameUI UI) 
     {
-        String positionKey = row + "," + col;
+        int[] positionKey = {row, col};
 
-        if (!starPositions.containsKey(positionKey)) 
+        // Use Arrays.equals() to compare arrays based on their content
+        if (!starPositions.keySet().stream().anyMatch(key -> Arrays.equals(key, positionKey))) 
         {
             return;
         }
 
-        String id = starPositions.get(positionKey);
+        // Find the matching key
+        Pair<int[], Color> data = starPositions.entrySet().stream()
+                .filter(entry -> Arrays.equals(entry.getKey(), positionKey))
+                .map(entry -> entry.getValue())
+                .findFirst()
+                .orElse(null);
 
-        GraphicNode node = new GraphicNode(id, 0, 0, radius, Color.rgb(50, 50, 50), Color.GRAY);
+        GraphicNode node = new GraphicNode(data.getFirst(), 0, 0, radius, Color.rgb(50, 50, 50), data.getSecond());
 
         add(node, col, row);
 

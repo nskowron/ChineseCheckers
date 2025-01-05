@@ -1,19 +1,28 @@
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class GraphicNode extends Circle 
 {
-    private String id;
+    private int[] id = new int[2]; // row, column
     private boolean isHighlighted = false;
     private final Color originalIN;
     private final Color originalOUT;
 
-    public GraphicNode(String id, double centerX, double centerY, double radius, Color colorIN, Color colorOUT) 
+    public GraphicNode(int[] id, double centerX, double centerY, double radius, Color colorIN, Color colorOUT) 
     {
         super(centerX, centerY, radius);
+
+        if (id == null || id.length != 2) 
+        {
+            throw new IllegalArgumentException("id must be an array of exactly 2 integers.");
+        }
+
         this.id = id;
 
-        setStrokeWidth(5);
+        setStrokeWidth(3);
 
         setFill(colorIN);
         setStroke(colorOUT);
@@ -34,12 +43,20 @@ public class GraphicNode extends Circle
         blue = Math.min(1.0, blue + 30.0 / 255.0);
 
         setStroke(new Color(red, green, blue, originalOUT.getOpacity()));
+
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setColor(new Color(red, green, blue, originalOUT.getOpacity()-0.2));
+        dropShadow.setRadius(70);
+        dropShadow.setOffsetX(2);
+        dropShadow.setOffsetY(2);
+        this.setEffect(dropShadow);
     }
 
     public void removeHighlight() 
     {
         isHighlighted = false;
         setStroke(originalOUT);
+        this.setEffect(null);
     }
 
     public boolean isHighlighted() 
@@ -47,7 +64,7 @@ public class GraphicNode extends Circle
         return isHighlighted;
     }
 
-    public String getGameId() 
+    public int[] getGameId() 
     {
         return id;
     }

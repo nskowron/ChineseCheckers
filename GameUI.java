@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.geometry.Insets;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ public class GameUI
         this.nodeSet.add(node);
     }
 
-    public void highlightNode(String nodeId)
+    public void highlightNode(int[] nodeId)
     {
         GraphicNode node = findNodeById(nodeId);
         if (node != null) 
@@ -59,7 +60,7 @@ public class GameUI
         }
     }
 
-    public void removeHighlightFromNode(String nodeId) 
+    public void removeHighlightFromNode(int[] nodeId) 
     {
         GraphicNode node = findNodeById(nodeId);
         if (node != null) 
@@ -86,11 +87,11 @@ public class GameUI
         systemOutputArea.appendText(text + "\n");
     }
 
-    private GraphicNode findNodeById(String nodeId) 
+    private GraphicNode findNodeById(int[] nodeId) 
     {
         for (GraphicNode node : this.nodeSet) 
         {
-            if (node.getGameId().equals(nodeId)) 
+            if (Arrays.equals(node.getGameId(), nodeId)) 
             {
                 return node;
             }
@@ -101,7 +102,7 @@ public class GameUI
     private void setupUI() 
     {
         // Set up the Board
-        boardGridPane.createBoard(14, this);
+        boardGridPane.createBoard(16, this);
 
         VBox rightVbox = new VBox();
         rightVbox.setStyle("-fx-background-color: rgb(50, 50, 50);");
@@ -122,8 +123,10 @@ public class GameUI
         // Create Logger Area
         systemOutputArea = new TextArea();
         systemOutputArea.setEditable(false);
-        systemOutputArea.setStyle("-fx-background-color: rgb(50, 50, 50); -fx-font-family: Consolas; -fx-font-size: 14px;");
-        systemOutputArea.setPrefHeight(730);
+        systemOutputArea.setStyle("-fx-font-family: Consolas; " +
+                                "-fx-font-size: 14px; " +
+                                "-fx-text-fill: black;");
+        systemOutputArea.setPrefHeight(800);
 
         rightVbox.getChildren().add(systemOutputArea);
 

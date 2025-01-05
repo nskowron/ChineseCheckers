@@ -1,51 +1,80 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 public class CheckersServer 
 {
     private static final int PORT = 12345;
-    private static AtomicInteger clientIdCounter = new AtomicInteger(1);
-    private static List<ClientHandler> connectedClients = new CopyOnWriteArrayList<>();
+
+    private static int clientIdCounter = 0;
+    private static ArrayList<ServerPlayer> connectedClients = new ArrayList<>();
+    private static Game game = null;
+
+    private static Object gameStarted = new Object();
+
+    private static Logger LOGGER = Logger.getLogger("Server");
 
     public static void main(String[] args) 
     {
-        Game game = new Game(new ValidityChecker(), new Board());
-
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) 
+        try(ServerSocket serverSocket = new ServerSocket(PORT)) 
         {
-            System.out.println("Server is running on port " + PORT + "...");
+            LOGGER.info("Server is running on port " + PORT + "...");
 
-            while (true) 
+            synchronized(gameStarted)
             {
-                Socket clientSocket = serverSocket.accept();
-                int clientId = clientIdCounter.getAndIncrement();
-                System.out.println("Client connected with ID: " + clientId);
-
-                // Create a new ClientHandler thread for each client
-                new Thread(new ClientHandler(clientSocket, game, clientId)).start();
+                while(true)
+                {
+                    // TODO: wait for max 6 players and everyone to be ready
+                }
             }
+
+            // while (true) 
+            // {
+            //     Socket clientSocket = serverSocket.accept();
+            //     System.out.println("Client connected with ID: " + clientId);
+
+            //     // Create a new ClientHandler thread for each client
+            //     new Thread(new ClientHandler(clientSocket, game, clientId)).start();
+            // }
         } 
-        catch (IOException e) 
+        catch(IOException e) 
         {
-            e.printStackTrace();
+            LOGGER.severe(e.getMessage());
         }
     }
 
-    public static void broadcastBoardUpdate(IBoard board) 
+    public static Game getGame()
     {
-        for (ClientHandler clientHandler : connectedClients) 
+        return game;
+    }
+
+    public static void setReady(Boolean ready, int id)
+    {
+        for(ServerPlayer client : connectedClients)
         {
-            clientHandler.sendBoardUpdate(board);
+            if(client.id == id)
+            {
+                client.ready = ready;
+                return;
+            }
         }
     }
 
-    // Remove clients from the list when they disconnect
-    public static void removeClient(ClientHandler client) 
+    public static synchronized void removeClient(int id) 
     {
-        connectedClients.remove(client);
-        System.out.println("Client " + client.clientId + " removed.");
+        for(int i = 0; i < connectedClients.size(); ++i)
+        {
+            if(connectedClients.get(i).id == id)
+            {
+                connectedClients.remove(i);
+                // probably do sth else
+
+                return;
+            }
+        }
     }
 }

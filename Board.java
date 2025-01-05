@@ -1,46 +1,45 @@
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class Board implements IBoard
 {
-    private List<Node> nodes;
+    private Map<String, Node> nodes;
 
     public Board() 
     {
-        this.nodes = new ArrayList<>();
+        this.nodes = new HashMap<>();
 
         //TODO: Implement node linking(later)
-        for(int i = 0; i < 100; ++i)
-        {
-            nodes.add(new Node(i));
-        }
-        for(int i = 0; i < 10; ++i)
-        {
-            nodes.get(i).place(new Piece(0));
-        }
     }
 
-    public void move(int startId, int endId) throws IllegalAccessError
+    @Override
+    public void move(Move move) throws IllegalAccessError
     {
-        Node start = findNodeById(startId);
-        Node end = findNodeById(endId);
+        Node start = findNodeById(move.startId);
+        Node end = findNodeById(move.endId);
 
         end.place(start.getPiece());
         start.take();
     }
 
-    public Node findNodeById(int id) throws IllegalAccessError
+    @Override
+    public Node findNodeById(String id)
     {
-        for(Node node : nodes) 
-        {
-            if(node.getID() == id) return node;
-        }
-        
-        throw new IllegalAccessError("Can't find node");
+        return nodes.get(id);
     }
 
-    public List<Node> getNodes() 
+    @Override
+    public Map<String, Node> getNodes() 
     {
         return nodes;
+    }
+
+    @Override
+    public void layPieces(List<Player> players) throws IllegalArgumentException
+    {
+        // TODO: Implement laying and assigning pieces
+        // check number of players
     }
 }

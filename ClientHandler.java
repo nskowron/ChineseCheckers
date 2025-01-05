@@ -1,111 +1,87 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.logging.Logger;
 
 public class ClientHandler implements Runnable 
 {
-    private Socket clientSocket;
-    private Game game;
-    public final int clientId;
+    private final int id;
+    private final Socket clientSocket;
+    private final Player player;
+    private Object gameStarted;
 
-    public ClientHandler(Socket clientSocket, Game game, int clientId) 
+    private Map<Request, RequestRunnable> requestHandler;
+
+    private final Logger LOGGER;
+
+    public ClientHandler(int id, Socket clientSocket, Player player, Object gameStarted) 
     {
+        this.id = id;
         this.clientSocket = clientSocket;
-        this.game = game;
-        this.clientId = clientId;
-    }
+        this.player = player;
+        this.gameStarted = gameStarted;
 
-    public void sendBoardUpdate(IBoard board) 
-    {
-        try 
-        {
-            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.writeObject(board);
-            out.flush();
-    
-            // Print confirmation for debugging
-            System.out.println("Board update sent to client " + clientId);
-        } 
-        catch (IOException e) 
-        {
-            e.printStackTrace();
-        }
+        LOGGER = Logger.getLogger("ServerPlayer " + player.id);
+
+        LOGGER.info("Client handler created");
     }
     
-
     @Override
     public void run() 
     {
-        try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-             ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) 
+        try(ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) 
         {
+            requestHandler = getDefaultRequestHandler(out, in);
 
-            // Send greeting with client ID
-            out.writeObject(clientId);
-            out.flush();
-
-            while (true) 
-            {
-                String clientRequest = (String) in.readObject();
-                System.out.println("Client " + clientId + " request: " + clientRequest);
-
-                switch (clientRequest) 
+            Thread readiness = new Thread(() -> {
+                while(true)
                 {
-                    case "GET_BOARD":
-                        out.writeObject(game.getBoard());
-                        out.flush();
-                        System.out.println("Board sent to client " + clientId + ".");
-                        break;
+                    Request request = (Request)in.readObject();
+                    if(request == Request.READY)
+                    {
+                        requestHandler.get(Request.READY).run(request);
+                    }
+                    else
+                    {
+                        Request error = Request.ERROR;
+                        error.setData(new Error("Game has not started yet"));
+                        out.writeObject(error);
+                    }
+                }
+            });
 
-                    case "GET_READY":
-                        out.writeObject("Client " + clientId + " is now ready!");
-                        out.flush();
-                        System.out.println("Client " + clientId + " marked as ready.");
-                        break;
-
-                    case "GET_NOT_READY":
-                        out.writeObject("Client " + clientId + " is now not ready.");
-                        out.flush();
-                        System.out.println("Client " + clientId + " marked as not ready.");
-                        break;
-
-                    case "SEND_MOVE":
-                        Move move = (Move) in.readObject();
-                        synchronized (game) 
-                        {
-                            System.out.println("Client " + clientId + " sent move: " + move.startId + " -> " + move.endId);
-
-                            try 
-                            {
-                                game.move(move);
-
-                                out.writeObject("Moved succesfully: " +  move.startId + " -> " + move.endId);
-                                out.flush();
-
-                                // Notify all clients about the updated board
-                                CheckersServer.broadcastBoardUpdate(game.getBoard());
-                            } 
-                            catch (IllegalArgumentException e) 
-                            {
-                                e.printStackTrace();
-                                out.writeObject("Error while moving: " + e.getMessage());
-                                out.flush();
-                            }
-                        }
-                        break;
-
-                    default:
-                        out.writeObject("Error: Unknown request.");
-                        System.out.println("Unknown request from client " + clientId + ": " + clientRequest);
+            readiness.start();
+            synchronized(gameStarted){}
+            readiness.stop(); // I know the risk
+            
+            while(true)
+            {
+                Request request = (Request)in.readObject();
+                RequestRunnable action = requestHandler.get(request);
+                if(action != null)
+                {
+                    action.run(request);
+                }
+                else
+                {
+                    Request error = Request.ERROR;
+                    error.setData("Non-handled request");
+                    out.writeObject(error);
                 }
             }
         } 
-        catch (EOFException e) 
+        catch(EOFException e) 
         {
-            System.out.println("Client " + clientId + " disconnected.");
+            LOGGER.info("Client disconnected");
+            CheckersServer.removeClient(id);
         } 
-        catch (IOException | ClassNotFoundException e) 
+        catch(IOException | ClassNotFoundException e) 
         {
-            e.printStackTrace();
+            LOGGER.severe("Communication error:\n" + e.getMessage());
         } 
         finally 
         {
@@ -115,8 +91,104 @@ public class ClientHandler implements Runnable
             } 
             catch (IOException e) 
             {
-                e.printStackTrace();
+                LOGGER.severe("Couldn't close client socket:\n" + e.getMessage());
             }
         }
+    }
+
+    private Map<Request, RequestRunnable> getDefaultRequestHandler(ObjectOutputStream out, ObjectInputStream in)
+    {
+        Map<Request, RequestRunnable> requestHandler = new HashMap<>();
+
+        requestHandler.put(Request.GREET, (Request greet) -> {
+            Request ack = Request.ACKNOWLEDGE;
+            ack.setData(player);
+            out.writeObject(ack);
+        });
+
+        requestHandler.put(Request.END_TURN, (Request end_turn) -> {
+            try
+            {
+                Request ack = Request.ACKNOWLEDGE;
+                synchronized(CheckersServer.class)
+                {
+                    Game game = CheckersServer.getGame();
+                    game.endTurn(player);
+                    ack.setData(game.getCurrentTurn());
+                }
+                out.writeObject(ack);
+            }
+            catch(IllegalAccessError e)
+            {
+                Request error = Request.ERROR;
+                error.setData(e);
+                out.writeObject(error);
+            }
+        });
+
+        requestHandler.put(Request.UPDATE, (Request update) -> {
+            Request ack = Request.ACKNOWLEDGE;
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                ack.setData(new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin()));
+            }
+            out.writeObject(ack);
+        });
+
+        requestHandler.put(Request.ACKNOWLEDGE, (Request ack) -> {
+            in.flush(); // cant do flush() on input, only output
+        });
+
+        requestHandler.put(Request.ERROR, (Request error) -> {
+            LOGGER.severe((Error)(error.getData()).getMessage());
+        });
+
+        requestHandler.put(Request.READY, (Request ready) -> {
+            if(ready.getData() != null)
+            {
+                synchronized(CheckersServer.class)
+                {
+                    CheckersServer.setReady((Boolean)ready.getData(), id);
+                }
+                out.writeObject(Request.ACKNOWLEDGE);
+            }
+            else
+            {
+                Request error = Request.ERROR;
+                error.setData(new Error("Cannot set readiness to null"));
+                out.writeObject(error);
+            }
+        });
+
+        requestHandler.put(Request.GET_MOVES, (Request get) -> {
+            Request moves = Request.ACKNOWLEDGE;
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                moves.setData(game.getValidMoves(player, (String)get.getData()));
+            }
+            out.writeObject(moves);
+        });
+
+        requestHandler.put(Request.MOVE, (Request move) -> {
+            try
+            {
+                synchronized(CheckersServer.class)
+                {
+                    Game game = CheckersServer.getGame();
+                    game.move(player, (Move)move.getData());
+                }
+                out.writeObject(Request.ACKNOWLEDGE);
+            }
+            catch(IllegalAccessError e)
+            {
+                Request error = Request.ERROR;
+                error.setData(e);
+                out.writeObject(error);
+            }
+        });
+
+        return requestHandler;
     }
 }

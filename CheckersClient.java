@@ -18,7 +18,7 @@ public class CheckersClient extends Application
         GameUiController gameController = new GameUiController(gameUI, gameClient);
 
         // Show the stage
-        Scene scene = new Scene(gameUI.getRoot(), 1190, 880);
+        Scene scene = new Scene(gameUI.getRoot(), 1250, 950);
         primaryStage.setResizable(false);
         primaryStage.setTitle("Chinese Checkers Client");
         primaryStage.setScene(scene);
