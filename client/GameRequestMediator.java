@@ -10,6 +10,7 @@ import java.net.*;
 import java.util.List;
 import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 public class GameRequestMediator implements Runnable 
@@ -127,7 +128,7 @@ public class GameRequestMediator implements Runnable
 
                 case "WAITING":
                     int[] data = (int[]) request.getData();
-                    gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);
+                    Platform.runLater(() -> {gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);}); // PODOBNIE TRZEBA WSZEDZIE DLA NIE-GLOWNYCH THREADOW ale nie chce ci zmieniac
 
                     break;
 

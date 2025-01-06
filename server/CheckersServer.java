@@ -37,7 +37,7 @@ public class CheckersServer
             synchronized(gameStarted)
             {
                 Thread acceptance = new Thread(() -> {
-                    while(true)
+                    while(!gameStarted.met)
                     {
                         if(connectedClients.size() < 6)
                         {
@@ -61,7 +61,7 @@ public class CheckersServer
                                     clientThread.start();
                                 }
                             }
-                            catch(IOException e){ LOGGER.severe(e.getMessage()); }
+                            catch(IOException e){ LOGGER.severe(e.getMessage()); try{ Thread.sleep(1000); }catch( InterruptedException f ){}}
                         }
                         else
                         {
@@ -91,7 +91,7 @@ public class CheckersServer
                             LOGGER.info("succeeded");
 
                             // Succeeded at creating game
-                            acceptance.stop();
+                            acceptance.interrupt();
                             break;
                         }
                     }
@@ -105,6 +105,7 @@ public class CheckersServer
                 LOGGER.info("Game has started");
             }
             // ClientThreads wake up
+            // Wait for them?
         } 
         catch(IOException e) 
         {

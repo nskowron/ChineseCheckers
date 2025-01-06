@@ -76,7 +76,7 @@ public class ClientHandler implements Runnable
 
         readiness.start();
         synchronized(gameStarted){}
-        readiness.stop(); // I know the risk
+        readiness.interrupt(); // as a matter of fact i did not know the risk
         
         while(running)
         {
