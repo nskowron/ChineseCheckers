@@ -61,7 +61,13 @@ public enum Request
     // Server sends:
     // -- MOVE
     // -- ERROR if the move is not valid
-    MOVE;
+    MOVE,
+
+    // WON
+    // Server expects: nothing
+    // Server sends:
+    // -- object Player - the winner
+    WON;
 
     protected Object data = null;
 

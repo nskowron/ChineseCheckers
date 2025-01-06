@@ -1,5 +1,6 @@
 package server;
 
+import shared.GameState;
 import shared.Move;
 import shared.Player;
 
@@ -12,11 +13,12 @@ public class Game implements Serializable
     private IValidityChecker checker;
     private IBoard board;
 
-    List<GamePlayer> players;
+    List<Player> players;
+    List<Player> winners;
 
     private int currentTurn;
 
-    public Game(IValidityChecker checker, IBoard board, List<GamePlayer> gamePlayers) throws IllegalArgumentException
+    public Game(IValidityChecker checker, IBoard board, List<Player> gamePlayers) throws IllegalArgumentException
     {
         List<Player> players = new ArrayList<>();
         for(Player player : gamePlayers)
@@ -28,11 +30,21 @@ public class Game implements Serializable
         this.board = board;
         this.checker = checker;
         this.players = gamePlayers;
+        this.winners = new ArrayList<>();
 
         this.currentTurn = 0;
     }
 
-    public void move(Player player, Move move) throws IllegalAccessError
+    public GameState getState()
+    {
+        return new GameState(
+            board.getNodes(),
+            players.get(currentTurn),
+            winners.size() > 0 ? winners.get(0) : null
+        );
+    }
+
+    public Boolean move(Player player, Move move) throws IllegalAccessError
     {
         if(player.getId() != players.get(currentTurn).getId())
         {
@@ -46,8 +58,10 @@ public class Game implements Serializable
         {
             board.move(move);
         }
+        return false; // TODO: add winning mechanics
     }
 
+    //make recursive for jumps
     public List<int[]> getValidMoves(Player player, int[] beginId)
     {
         List<int[]> endIds = new ArrayList<>();

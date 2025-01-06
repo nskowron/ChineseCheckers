@@ -12,9 +12,9 @@ public class GameState
 {
     public final Map<int[], Color> board;
     public final Player currentTurn;
-    public final boolean won;
+    public final Player won;
 
-    public GameState(Map<int[], Node> nodes, Player currentTurn, boolean won)
+    public GameState(Map<int[], Node> nodes, Player currentTurn, Player won)
     {
         this.currentTurn = currentTurn;
         this.won = won;

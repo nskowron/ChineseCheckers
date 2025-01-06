@@ -101,7 +101,7 @@ public class GameRequestMediator implements Runnable
                     {
                         gameEndPoint.setMyTurn(true);
                         
-                        if(startState.won)
+                        if(gameEndPoint.getPlayer().getId() == startState.won.getId())
                         {
                             gameEndPoint.won();
                         }
@@ -152,7 +152,7 @@ public class GameRequestMediator implements Runnable
                         gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
                         gameEndPoint.setMyTurn(true);
                         
-                        if(state.won)
+                        if(gameEndPoint.getPlayer().getId() == state.won.getId())
                         {
                             gameEndPoint.won();
                         }
