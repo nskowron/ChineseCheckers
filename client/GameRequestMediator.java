@@ -41,8 +41,6 @@ public class GameRequestMediator implements Runnable
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            sendRequest(Request.GREET);
-
             while (true) 
             {
                 Request request = (Request) in.readObject();
