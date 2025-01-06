@@ -9,7 +9,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.geometry.Insets;
 
@@ -35,8 +34,6 @@ public class GameUI
 
         this.boardGridPane = new BoardGridPane();
         this.nodeSet = new HashSet<>();
-
-        setupUI();
     }
 
     public VBox getRoot() 
@@ -89,7 +86,7 @@ public class GameUI
         }
     }
 
-    public void setCurrentPlayerTurn(String playerTurn) 
+    public void setCurrentLabelText(String playerTurn) 
     {
         currentPlayerLabel.setText("Current Player: " + playerTurn);
     }
@@ -111,7 +108,7 @@ public class GameUI
         return null;
     }
 
-    private void setupUI() 
+    public void setupUI() 
     {
         // Set up the Board
         boardGridPane.createBoard(16, this);

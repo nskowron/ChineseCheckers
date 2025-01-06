@@ -6,34 +6,38 @@ import shared.Player;
 
 import java.io.*;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
+
 public class GameUiController 
 {
     private final GameUI gameUI;
+    private final WelcomeUI welcomeUI;
     private final GameRequestMediator requestReceiver;
 
     // Move Helpers
     private GraphicNode firstSelectedNode = null;
     private GraphicNode secondSelectedNode = null;
 
+    // UI Stages
+    private Stage waitingRoom;
+    private Stage gameRoom;
+
     // Current Data
     private boolean myTurn = false;
     private boolean locked = false;
     private Player player;
 
-    public GameUiController(GameUI gameUI, GameRequestMediator requestReceiver) 
+    public GameUiController(GameUI gameUI, WelcomeUI welcomeUI, GameRequestMediator requestReceiver) 
     {
         this.gameUI = gameUI;
+        this.welcomeUI = welcomeUI;
         this.requestReceiver = requestReceiver;
-    }
-
-    public void won()
-    {
-        //TODO IDK SOMETHING TO SHOW THAT YOU WON?
-    }
-
-    public GameUI getGameUI()
-    {
-        return this.gameUI;
+        gameUI.setupUI();
+        welcomeUI.setupUI(requestReceiver);
     }
 
     public void lock()
@@ -46,24 +50,47 @@ public class GameUiController
         locked = false;
     }
 
-    public void setMyTurn(Boolean input)
+    public void startGame() throws IllegalStateException
     {
-        this.myTurn = input;
+        if(waitingRoom != null && gameRoom != null)
+        {
+            waitingRoom.close();
+            gameRoom.show();
+        }
+        else
+        {
+            throw new IllegalStateException("Missing components", null);
+        }
     }
 
-    public Boolean isTurn()
+    public void endGame()
     {
-        return myTurn;
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.getDialogPane().setStyle("-fx-text-fill: white; -fx-background-color: rgb(50,5050,50); -fx-font-size: 20px; -fx-border-width: 5px; -fx-border-radius: 10px; -fx-background-radius: 15px;  -fx-border-color: rgb(30, 30, 30); -fx-font-family: 'Arial';");
+        alert.setHeaderText("Game Has Ended");
+        alert.setContentText("SOMEONE WON, BUT NOT YOU :C");
+        alert.showAndWait().ifPresent(response -> 
+        {
+            if (response == ButtonType.FINISH) 
+            {
+                Platform.exit(); 
+            }
+        });
     }
 
-    public void setPlayer(Player player)
+    public void won()
     {
-        this.player = player;
-    }
-
-    public Player getPlayer()
-    {
-        return this.player;
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.getDialogPane().setStyle("-fx-text-fill: white; -fx-background-color: rgb(50,5050,50); -fx-font-size: 20px; -fx-border-width: 5px; -fx-border-radius: 10px; -fx-background-radius: 15px;  -fx-border-color: rgb(30, 30, 30); -fx-font-family: 'Arial';");
+        alert.setHeaderText("Game Has Ended");
+        alert.setContentText("You Have WON!");
+        alert.showAndWait().ifPresent(response -> 
+        {
+            if (response == ButtonType.FINISH) 
+            {
+                Platform.exit(); 
+            }
+        });
     }
 
     public void setup()
@@ -182,5 +209,41 @@ public class GameUiController
                 gameUI.appendToSystemOutput("Please select 2 Nodes to confirm move");
             }
         });
+    }
+
+    public void setRooms(Stage waitingRoom, Stage gameRoom)
+    {
+        this.waitingRoom = waitingRoom;
+        this.gameRoom = gameRoom;
+    }
+
+    public GameUI getGameUI()
+    {
+        return this.gameUI;
+    }
+
+    public WelcomeUI getWelcomeUI()
+    {
+        return this.welcomeUI;
+    }
+
+    public void setMyTurn(Boolean input)
+    {
+        this.myTurn = input;
+    }
+
+    public Boolean isTurn()
+    {
+        return myTurn;
+    }
+
+    public void setPlayer(Player player)
+    {
+        this.player = player;
+    }
+
+    public Player getPlayer()
+    {
+        return this.player;
     }
 }
