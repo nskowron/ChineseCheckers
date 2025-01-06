@@ -8,24 +8,23 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javafx.scene.paint.Color;
 
 public class GameRequestMediator implements Runnable 
 {
-    private final String serverAddress;
-    private final int serverPort;
+    private final String SERVER_ADDRES;
+    private final int SERVER_PORT;
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
     private GameUiController gameEndPoint;
 
-    public GameRequestMediator(String serverAddress, int serverPort) 
+    public GameRequestMediator(String SERVER_ADDRES, int SERVER_PORT) 
     {
-        this.serverAddress = serverAddress;
-        this.serverPort = serverPort;
+        this.SERVER_ADDRES = SERVER_ADDRES;
+        this.SERVER_PORT = SERVER_PORT;
     }
 
     public void addGameController(GameUiController controler)
@@ -38,7 +37,7 @@ public class GameRequestMediator implements Runnable
     {
         try 
         {
-            socket = new Socket(serverAddress, serverPort);
+            socket = new Socket(SERVER_ADDRES, SERVER_PORT);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
@@ -62,23 +61,59 @@ public class GameRequestMediator implements Runnable
         out.flush();
     }
 
-    private void handleServerResponse(Request request) throws IOException 
+    private void handleServerResponse(Request request) throws IOException, IllegalStateException
     {
         if(gameEndPoint == null)
         {
-            throw new IllegalStateException("can't really handle response with no endpoint...", null);
+            throw new IllegalStateException("Missing components", null);
         }
         try
-        {   //TODO REMEMBER TO USE unlock() FOR GAME UI AFTER EACH MOVE, UI IS LOCKED EVERY TIME GET MOVES OR MOVE IS SENT
+        {   // REMEMBER TO USE unlock() FOR GAME UI AFTER EACH MOVE, UI IS LOCKED EVERY TIME GET MOVES OR MOVE IS SENT
+            // TODO Other requests?
             switch (request) 
             {
                 case GREET:
 
                     Player player = (Player) request.getData();
                     gameEndPoint.setPlayer(player);
-                    //TODO FILL BOARD WITH CORRECT COLORS (PIONKI)
 
                     break;
+
+                case GAME_START:
+
+                    gameEndPoint.startGame();
+                    gameEndPoint.lock();
+
+                    GameState startState = (GameState) request.getData();
+
+                    for(Map.Entry<int[], Color> entry : startState.board.entrySet())
+                    {
+                        int[] key = entry.getKey();   
+                        Color color = entry.getValue();
+                        GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
+                        if(node != null)
+                        {
+                            node.setFill(color);
+                        }
+                    }
+
+                    if(gameEndPoint.getPlayer().getId() == startState.currentTurn.getId())
+                    {
+                        gameEndPoint.setMyTurn(true);
+                        
+                        if(startState.won)
+                        {
+                            gameEndPoint.won();
+                        }
+                    }
+                    else
+                    {
+                        gameEndPoint.setMyTurn(false);
+                    }
+
+                    gameEndPoint.unlock();
+                    break;
+
                 case GET_MOVES:
 
                     List<int[]> nodes = (List<int[]>) request.getData();
@@ -90,6 +125,13 @@ public class GameRequestMediator implements Runnable
                     gameEndPoint.unlock();
 
                     break;
+
+                case WAITING:
+                    int[] data = (int[]) request.getData();
+                    gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);
+
+                    break;
+
                 case UPDATE:
 
                     GameState state = (GameState) request.getData();
@@ -107,6 +149,7 @@ public class GameRequestMediator implements Runnable
 
                     if(gameEndPoint.getPlayer().getId() == state.currentTurn.getId())
                     {
+                        gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
                         gameEndPoint.setMyTurn(true);
                         
                         if(state.won)
@@ -116,19 +159,17 @@ public class GameRequestMediator implements Runnable
                     }
                     else
                     {
+                        gameEndPoint.getGameUI().setCurrentLabelText(Integer.toString(state.currentTurn.getId()));
                         gameEndPoint.setMyTurn(false);
                     }
 
                     gameEndPoint.unlock();
 
                     break;
-                case READY:
 
-                    // UPDATE THE WELCOME SCREEN
-
-                    break;
                 default:
-                    throw new IllegalArgumentException("TF Happened");
+                    System.out.println("TF Happened");
+                    break;
             }
         }
         catch(ClassCastException e)
