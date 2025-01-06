@@ -128,6 +128,7 @@ public class ClientHandler implements Runnable
 
     public void send(Request request)
     {
+        LOGGER.info("sending " + request);
         try
         {
             out.writeObject(request);
@@ -146,7 +147,9 @@ public class ClientHandler implements Runnable
     {
         try
         {
-            return (Request)in.readObject();
+            Request request = (Request)in.readObject();
+            LOGGER.info("receiving " + request);
+            return request;
         }
         catch(EOFException e)
         {
