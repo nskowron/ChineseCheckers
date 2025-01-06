@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.geometry.Insets;
 
@@ -98,7 +99,7 @@ public class GameUI
         systemOutputArea.appendText(text + "\n");
     }
 
-    private GraphicNode findNodeById(int[] nodeId) 
+    public GraphicNode findNodeById(int[] nodeId) 
     {
         for (GraphicNode node : this.nodeSet) 
         {

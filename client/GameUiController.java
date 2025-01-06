@@ -2,22 +2,38 @@ package client;
 
 import shared.Move;
 import shared.Request;
+import shared.Player;
 
 import java.io.*;
 
 public class GameUiController 
 {
     private final GameUI gameUI;
-    private final GameClient gameClient;
+    private final GameRequestMediator requestReceiver;
+
+    // Move Helpers
     private GraphicNode firstSelectedNode = null;
     private GraphicNode secondSelectedNode = null;
 
+    // Current Data
+    private boolean myTurn = false;
     private boolean locked = false;
+    private Player player;
 
-    public GameUiController(GameUI gameUI, GameClient gameClient) 
+    public GameUiController(GameUI gameUI, GameRequestMediator requestReceiver) 
     {
         this.gameUI = gameUI;
-        this.gameClient = gameClient;
+        this.requestReceiver = requestReceiver;
+    }
+
+    public void won()
+    {
+        //TODO IDK SOMETHING TO SHOW THAT YOU WON?
+    }
+
+    public GameUI getGameUI()
+    {
+        return this.gameUI;
     }
 
     public void lock()
@@ -30,6 +46,26 @@ public class GameUiController
         locked = false;
     }
 
+    public void setMyTurn(Boolean input)
+    {
+        this.myTurn = input;
+    }
+
+    public Boolean isTurn()
+    {
+        return myTurn;
+    }
+
+    public void setPlayer(Player player)
+    {
+        this.player = player;
+    }
+
+    public Player getPlayer()
+    {
+        return this.player;
+    }
+
     public void setup()
     {
         // Listen for node clicks
@@ -37,7 +73,7 @@ public class GameUiController
         {
             node.setOnMouseClicked(event -> 
             {
-                if (!gameClient.isMyTurn() || locked) return;
+                if (!myTurn || locked) return;
         
                 if(node == firstSelectedNode)
                 {
@@ -55,7 +91,7 @@ public class GameUiController
                     request.setData(firstSelectedNode.getGameId());
                     try
                     {
-                        gameClient.sendRequest(request);
+                        requestReceiver.sendRequest(request);
                     }
                     catch (IOException e)
                     {
@@ -72,7 +108,7 @@ public class GameUiController
                         request.setData(firstSelectedNode.getGameId());
                         try
                         {
-                            gameClient.sendRequest(request);
+                            requestReceiver.sendRequest(request);
                         }
                         catch (IOException e)
                         {
@@ -94,22 +130,29 @@ public class GameUiController
 
         gameUI.getEndTurnButton().setOnAction(event -> 
         {
-            if (!gameClient.isMyTurn() || locked)
+            if(!locked)
             {
-                gameUI.appendToSystemOutput("It's not your turn, you can't end it");
+                if (!myTurn)
+                {
+                    gameUI.appendToSystemOutput("It's not your turn, you can't end it");
+                }
+                else
+                {
+                    Request request = Request.END_TURN;
+                    try
+                    {
+                        requestReceiver.sendRequest(request);
+                    }
+                    catch (IOException e)
+                    {
+                        gameUI.appendToSystemOutput(e.getMessage());
+                        unlock();
+                    }
+                }
             }
             else
             {
-                Request request = Request.END_TURN;
-                try
-                {
-                    gameClient.sendRequest(request);
-                }
-                catch (IOException e)
-                {
-                    gameUI.appendToSystemOutput(e.getMessage());
-                    unlock();
-                }
+                gameUI.appendToSystemOutput("UI temporary locked, awaiting server response....");
             }
         });
 
@@ -122,7 +165,7 @@ public class GameUiController
                 request.setData(new Move(firstSelectedNode.getGameId(), secondSelectedNode.getGameId()));
                 try
                 {
-                    gameClient.sendRequest(request);
+                    requestReceiver.sendRequest(request);
                     gameUI.clearAllHighlights();
                     firstSelectedNode = null;
                     secondSelectedNode = null;
