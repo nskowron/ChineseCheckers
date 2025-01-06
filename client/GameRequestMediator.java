@@ -1,5 +1,6 @@
 package client;
 
+import shared.ColorTranslator;
 import shared.GameState;
 import shared.Player;
 import shared.Request;
@@ -68,26 +69,26 @@ public class GameRequestMediator implements Runnable
         try
         {   // REMEMBER TO USE unlock() FOR GAME UI AFTER EACH MOVE, UI IS LOCKED EVERY TIME GET MOVES OR MOVE IS SENT
             // TODO Other requests?
-            switch (request) 
+            switch (request.getType()) 
             {
-                case GREET:
+                case "GREET":
 
                     Player player = (Player) request.getData();
                     gameEndPoint.setPlayer(player);
 
                     break;
 
-                case GAME_START:
+                case "GAME_START":
 
                     gameEndPoint.startGame();
                     gameEndPoint.lock();
 
                     GameState startState = (GameState) request.getData();
 
-                    for(Map.Entry<int[], Color> entry : startState.board.entrySet())
+                    for(Map.Entry<int[], String> entry : startState.board.entrySet())
                     {
                         int[] key = entry.getKey();   
-                        Color color = entry.getValue();
+                        Color color = ColorTranslator.get(entry.getValue());
                         GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
                         if(node != null)
                         {
@@ -112,7 +113,7 @@ public class GameRequestMediator implements Runnable
                     gameEndPoint.unlock();
                     break;
 
-                case GET_MOVES:
+                case "GET_MOVES":
 
                     List<int[]> nodes = (List<int[]>) request.getData();
                     for(int[] nodeId : nodes)
@@ -124,20 +125,20 @@ public class GameRequestMediator implements Runnable
 
                     break;
 
-                case WAITING:
+                case "WAITING":
                     int[] data = (int[]) request.getData();
                     gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);
 
                     break;
 
-                case UPDATE:
+                case "UPDATE":
 
                     GameState state = (GameState) request.getData();
 
-                    for(Map.Entry<int[], Color> entry : state.board.entrySet())
+                    for(Map.Entry<int[], String> entry : state.board.entrySet())
                     {
                         int[] key = entry.getKey();   
-                        Color color = entry.getValue();
+                        Color color = ColorTranslator.get(entry.getValue());
                         GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
                         if(node != null)
                         {
@@ -163,6 +164,10 @@ public class GameRequestMediator implements Runnable
 
                     gameEndPoint.unlock();
 
+                    break;
+
+                case "ERROR":
+                    System.out.println(((Error)request.getData()).getMessage());
                     break;
 
                 default:

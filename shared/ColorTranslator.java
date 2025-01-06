@@ -13,7 +13,8 @@ public class ColorTranslator
         "RED", Color.RED,
         "MAGENTA", Color.MAGENTA,
         "YELLOW", Color.YELLOW,
-        "BLUE", Color.BLUE
+        "BLUE", Color.BLUE,
+        "DEFAULT", Color.rgb(50, 50, 50)
     );
 
     public static Color get(String name)

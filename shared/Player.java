@@ -1,24 +1,24 @@
 package shared;
 
-import javafx.scene.paint.Color;
+import java.io.Serializable;
 
-public class Player
+public class Player implements Serializable
 {
     protected final int id;
-    protected Color color;
+    protected String color;
 
     protected boolean won;
 
     public Player(int id)
     {
         this.id = id;
-        this.color = Color.rgb(50, 50, 50);
+        this.color = "DEFAULT";
         this.won = false;
     }
 
-    public void setColor(Color color)
+    public void setColor(String color)
     {
-        if(this.color == Color.rgb(50, 50, 50))
+        if(this.color.equals("DEFAULT"))
         {
             this.color = color;
         }
@@ -29,7 +29,7 @@ public class Player
         return id;
     }
 
-    public Color getColor()
+    public String getColor()
     {
         return color;
     }

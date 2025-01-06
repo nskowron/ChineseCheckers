@@ -26,6 +26,7 @@ public class CheckersServer
 
     public static void main(final String[] args) 
     {
+        System.out.println(Boolean.FALSE instanceof Boolean);
         try(ServerSocket serverSocket = new ServerSocket(PORT)) 
         {
             LOGGER.info("Server is running on port " + PORT + "...");
@@ -135,9 +136,7 @@ public class CheckersServer
             }
             everyoneReady = players[0] == players[1];
 
-            Request waiting = Request.WAITING;
-            waiting.setData(players);
-            broadcast(waiting);
+            broadcast(new Request("WAITING", players));
         }
     }
 
@@ -154,9 +153,7 @@ public class CheckersServer
 
                     if(gameStarted.met)
                     {
-                        Request error = Request.ERROR;
-                        error.setData(new Error("Client " + id + " disconnected"));
-                        broadcast(error);
+                        broadcast(new Request("ERROR", new Error("Client " + id + " disconnected")));
                     }
 
                     return;

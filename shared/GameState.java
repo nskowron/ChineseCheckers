@@ -2,15 +2,15 @@ package shared;
 
 import java.util.Map;
 
-import javafx.scene.paint.Color;
 import server.Node;
 import server.Piece;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class GameState
+public class GameState implements Serializable
 {
-    public final Map<int[], Color> board;
+    public final Map<int[], String> board;
     public final Player currentTurn;
     public final Player won;
 
@@ -19,13 +19,13 @@ public class GameState
         this.currentTurn = currentTurn;
         this.won = won;
 
-        Map<int[], Color> boardColors = new HashMap<>();
+        Map<int[], String> boardColors = new HashMap<>();
         for(Map.Entry<int[], Node> node : nodes.entrySet())
         {
             Piece piece = node.getValue().getPiece();
             if(piece == null)
             {
-                boardColors.put(node.getKey(), Color.rgb(50, 50, 50));
+                boardColors.put(node.getKey(), "DEFAULT");
             }
             else
             {

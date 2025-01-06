@@ -114,11 +114,9 @@ public class GameUiController
                     node.highlight();
                     lock();
         
-                    Request request = Request.GET_MOVES;
-                    request.setData(firstSelectedNode.getGameId());
                     try
                     {
-                        requestReceiver.sendRequest(request);
+                        requestReceiver.sendRequest(new Request("GET_MOVES", firstSelectedNode.getGameId()));
                     }
                     catch (IOException e)
                     {
@@ -131,11 +129,9 @@ public class GameUiController
                 {
                     if(node == secondSelectedNode)
                     {
-                        Request request = Request.GET_MOVES;
-                        request.setData(firstSelectedNode.getGameId());
                         try
                         {
-                            requestReceiver.sendRequest(request);
+                            requestReceiver.sendRequest(new Request("GET_MOVES", firstSelectedNode.getGameId()));
                         }
                         catch (IOException e)
                         {
@@ -165,10 +161,9 @@ public class GameUiController
                 }
                 else
                 {
-                    Request request = Request.END_TURN;
                     try
                     {
-                        requestReceiver.sendRequest(request);
+                        requestReceiver.sendRequest(new Request("END_TURN", null));
                     }
                     catch (IOException e)
                     {
@@ -188,11 +183,9 @@ public class GameUiController
             if (firstSelectedNode != null && secondSelectedNode != null) 
             {
                 lock();
-                Request request = Request.MOVE;
-                request.setData(new Move(firstSelectedNode.getGameId(), secondSelectedNode.getGameId()));
                 try
                 {
-                    requestReceiver.sendRequest(request);
+                    requestReceiver.sendRequest(new Request("MOVE", new Move(firstSelectedNode.getGameId(), secondSelectedNode.getGameId())));
                     gameUI.clearAllHighlights();
                     firstSelectedNode = null;
                     secondSelectedNode = null;
