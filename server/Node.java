@@ -59,6 +59,16 @@ public class Node implements Serializable
         return placeholder;
     }
 
+    public String getColorStarting()
+    {
+        return colorStarting;
+    }
+
+    public String getColorTarget()
+    {
+        return colorTarget;
+    }
+
     public Piece take() throws IllegalAccessError
     {
         if(placeholder == null)

@@ -6,6 +6,7 @@ import utils.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +19,16 @@ public class Board implements IBoard
 {
     private Map<int[], Node> nodes;
 
+    private List<String> starColors;
+
     public Board(File jsonStarFile) throws IOException, StreamReadException, DatabindException
     {
         this.nodes = new HashMap<>();
 
         ObjectMapper jsonMapper = new ObjectMapper();
         Star star = jsonMapper.readValue(jsonStarFile, Star.class);
+
+        this.starColors = star.starColors;
 
         for(Star.Data data : star.starPositions)
         {
@@ -37,15 +42,15 @@ public class Board implements IBoard
             }
             else
             {
-                node = new Node(id, colorStarting, star.starColors.get((star.starColors.indexOf(colorStarting) + 3) % 6)); // TO CHANGE THAT I NEED TO CHANGE THE JSON FILE
+                node = new Node(id, colorStarting, starColors.get((starColors.indexOf(colorStarting) + 3) % 6)); // TO CHANGE THAT I NEED TO CHANGE THE JSON FILE
             }
 
             nodes.put(id, node);
         }
 
-        for(Map.Entry<int[], Node> node : nodes.entrySet())
+        for(Node node : nodes.values())
         {
-            linkRecursive(node.getValue());
+            linkRecursive(node);
             break;
         }
     }
@@ -75,8 +80,48 @@ public class Board implements IBoard
     @Override
     public void layPieces(List<Player> players) throws IllegalArgumentException
     {
-        // TODO: Implement laying and assigning pieces
-        // check number of players
+        int[] playedColorId;
+
+        switch(players.size())
+        {
+            case 2:
+                playedColorId = new int[]{0, 3};
+                break;
+
+            case 3:
+                playedColorId = new int[]{0, 2, 4};
+                break;
+
+            case 4:
+                playedColorId = new int[]{1, 2, 4, 5};
+                break;
+
+            case 6:
+                playedColorId = new int[]{0, 1, 2, 3, 4, 5};
+                break;
+
+            default:
+                throw new IllegalArgumentException("Wrong number of players");
+        }
+
+        Map<String, Player> playerColors = new HashMap<>();
+
+        for(int i : playedColorId)
+        {
+            String color = starColors.get(i);
+            Player player = players.get(i);
+            player.setColor(color);
+            playerColors.put(color, player);
+        }
+
+        for(Node node : nodes.values())
+        {
+            String color = node.getColorStarting();
+            if(playerColors.containsKey(color))
+            {
+                node.place(new Piece(color, playerColors.get(color)));
+            }
+        }
     }
 
     private void linkRecursive(Node node)
