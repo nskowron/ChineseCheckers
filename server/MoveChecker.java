@@ -2,6 +2,7 @@ package server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import shared.Move;
 
@@ -17,7 +18,25 @@ public class MoveChecker implements IMoveChecker
     @Override
     public boolean validMove(Move move, MoveData prev)
     {
-        return true;
+        Node startNode = board.findNodeById(move.startId);
+        Node endNode = board.findNodeById(move.endId);
+
+        if(startNode.getPiece() == null || endNode.getPiece() != null)
+        {
+            return false;
+        }
+
+        if(prev != null && !prev.jump)
+        {
+            return false;
+        }
+
+        if(jumpMove(move))
+        {
+            return true;
+        }
+
+        return startNode.getNeighbors().contains(endNode);
     }
 
     @Override
@@ -57,6 +76,24 @@ public class MoveChecker implements IMoveChecker
     @Override
     public List<int[]> getValidMoves(int[] beginId, MoveData prev)
     {
-        return new ArrayList<>();
+        Set<int[]> endIds = Set.of();
+
+        Node beginNode = board.findNodeById(beginId);
+        for(Node neighbor : beginNode.getNeighbors())
+        {
+            if(validMove(new Move(beginId, neighbor.getID()), prev))
+            {
+                endIds.add(neighbor.getID());
+            }
+        }
+
+        endIds.addAll(getValidMovesRecursive(beginNode, prev, -1));
+
+        return new ArrayList<>(endIds);
+    }
+
+    private Set<int[]> getValidMovesRecursive(Node jumpNode, MoveData prev, int skipDirection)
+    {
+        return Set.of();
     }
 }
