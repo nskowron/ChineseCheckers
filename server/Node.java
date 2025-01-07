@@ -36,7 +36,7 @@ public class Node implements Serializable
         this.neighbors.add(idx, neighbor);
     }
 
-    public void addNeighbors(ArrayList<Node> neighbors) 
+    public void addNeighbors(List<Node> neighbors) 
     {
         if(neighbors.size() == 6)
         {

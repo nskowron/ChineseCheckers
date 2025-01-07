@@ -26,13 +26,23 @@ public class CheckersServer
 
     public static void main(final String[] args) 
     {
-        System.out.println(Boolean.FALSE instanceof Boolean);
+        IBoard board;
+        IValidityChecker validator;
+        try
+        {
+            File jsonStarFile = new File("data/star.json");
+            validator = new ValidityChecker(); // Will depend on the argument
+            board = new Board(jsonStarFile);
+        }
+        catch(IOException e)
+        {
+            LOGGER.severe(e.getMessage());
+            return;
+        }
+
         try(ServerSocket serverSocket = new ServerSocket(PORT)) 
         {
             LOGGER.info("Server is running on port " + PORT + "...");
-
-            IValidityChecker validator = new ValidityChecker(); // Will depend on the argument
-            IBoard board = new Board();
 
             synchronized(gameStarted)
             {
