@@ -1,3 +1,7 @@
+package server;
+
+import shared.Move;
+
 public class ValidityChecker implements IValidityChecker
 {
     @Override

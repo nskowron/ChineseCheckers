@@ -1,44 +1,46 @@
+package server;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Node implements Serializable
 {
-    private final int id;
-
-    private final int playerTarget;
+    public final int[] id;
+    public final String colorStarting;
+    public final String colorTarget;
 
     private Piece placeholder;
     private List<Node> neighbors;
 
-    public Node(int id, int playerTarget, Piece piece) 
+    public Node(int[] id, String colorStarting, String colorTarget) 
     {
         this.id = id;
-        this.playerTarget = playerTarget;
-        this.placeholder = piece;
+        this.colorStarting = colorStarting;
+        this.colorTarget = colorTarget;
+
         this.neighbors = new ArrayList<>();
-    }
-
-    public Node(int id, int playerTarget)
-    {
-        this(id, playerTarget, null);
-    }
-
-    public Node(int id) 
-    {
-        this(id, -1, null);
-    }
-
-    public void addNeighbor(Node neighbor) 
-    {
-        this.neighbors.add(neighbor);
-    }
-
-    public void addNeighbors(List<Node> neighbors) 
-    {
-        for(Node input : neighbors)
+        for(int i = 0; i < 6; ++i)
         {
-            this.neighbors.add(input);
+            neighbors.add(null);
+        }
+    }
+
+    public Node(int[] id)
+    {
+        this(id, "DEFAULT", "DEFAULT");
+    }
+
+    public void addNeighbor(int idx, Node neighbor) 
+    {
+        this.neighbors.add(idx, neighbor);
+    }
+
+    public void addNeighbors(ArrayList<Node> neighbors) 
+    {
+        if(neighbors.size() == 6)
+        {
+            this.neighbors = neighbors;
         }
     }
 
@@ -47,14 +49,9 @@ public class Node implements Serializable
         return neighbors;
     }
 
-    public int getID()
+    public int[] getID()
     {
         return id;
-    }
-
-    public int getPlayerTarget()
-    {
-        return playerTarget;
     }
 
     public Piece getPiece()
