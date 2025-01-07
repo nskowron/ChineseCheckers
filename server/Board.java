@@ -3,6 +3,7 @@ package server;
 import shared.Move;
 import shared.Player;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,11 @@ public class Board implements IBoard
 {
     private Map<int[], Node> nodes;
 
-    public Board() 
+    public Board(File star) 
     {
         this.nodes = new HashMap<>();
+
+        
 
         //TODO: Implement node linking(later)
         

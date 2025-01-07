@@ -144,7 +144,7 @@ public class ClientHandler implements Runnable
 
     public void send(Request request)
     {
-        LOGGER.info("sending " + request);
+        LOGGER.info("sending " + request.getType());
         LOGGER.info("data: " + request.getData());
         try
         {
@@ -167,7 +167,7 @@ public class ClientHandler implements Runnable
             synchronized(in)
             {
                 Request request = (Request)in.readObject();
-                LOGGER.info("receiving " + request);
+                LOGGER.info("receiving " + request.getType());
                 return request;
             }
         }

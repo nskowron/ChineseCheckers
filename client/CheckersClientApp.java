@@ -28,7 +28,7 @@ public class CheckersClientApp extends Application
 
         // Main Stage
         this.primaryStage = primaryStage;
-        Scene scene = new Scene(gameUI.getRoot(), 1250, 950);
+        Scene scene = new Scene(gameUI.getRoot(), 1250, 980);
         this.primaryStage.setTitle("Chinese Checkers Client");
         this.primaryStage.setScene(scene);
         this.primaryStage.setResizable(false);
