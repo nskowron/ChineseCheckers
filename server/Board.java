@@ -106,9 +106,9 @@ public class Board implements IBoard
 
         Map<String, Player> playerColors = new HashMap<>();
 
-        for(int i : playedColorId)
+        for(int i = 0; i < players.size(); ++i)
         {
-            String color = starColors.get(i);
+            String color = starColors.get(playedColorId[i]);
             Player player = players.get(i);
             player.setColor(color);
             playerColors.put(color, player);

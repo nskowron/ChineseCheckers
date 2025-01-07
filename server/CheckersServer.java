@@ -63,10 +63,12 @@ public class CheckersServer
                                     Player player = new Player(clientIdCounter);
                                     ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
                                     Thread clientThread = new Thread(client);
-                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread, false);
+                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
 
                                     connectedClients.add(connectedClient);
+                                    setReady(false, clientIdCounter);
                                     ++clientIdCounter;
+
 
                                     clientThread.start();
                                 }
@@ -91,7 +93,7 @@ public class CheckersServer
                     {
                         synchronized(connectedClients)
                         {
-                            LOGGER.info("trying to create game");
+                            LOGGER.info("trying to create game - players: " + connectedClients.size());
                             List<Player> players = new ArrayList<>();
                             for(ServerPlayer client : connectedClients)
                             {
