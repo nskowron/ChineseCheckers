@@ -29,7 +29,19 @@ public class MoveChecker implements IMoveChecker
     @Override
     public boolean jumpMove(Move move)
     {
-        return false;
+        List<Node> neigbors1 = board.findNodeById(move.startId).getNeighbors();
+        List<Node> neigbors2 = board.findNodeById(move.startId).getNeighbors();
+        List<Node> commonNeighbors = new ArrayList<>();
+
+        for(Node neighbor : neigbors1)
+        {
+            if(neigbors2.contains(neighbor))
+            {
+                commonNeighbors.add(neighbor);
+            }
+        }
+
+        return commonNeighbors.size() == 1 && commonNeighbors.get(0).getPiece() != null;
     }
 
     @Override
