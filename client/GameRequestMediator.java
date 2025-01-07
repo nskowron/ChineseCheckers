@@ -174,7 +174,7 @@ public class GameRequestMediator implements Runnable
                         }
                         else
                         {
-                            gameEndPoint.getGameUI().setCurrentLabelText(Integer.toString(state.currentTurn.getId()));
+                            gameEndPoint.getGameUI().setCurrentLabelText(state.currentTurn.getColor());
                             gameEndPoint.setMyTurn(false);
                         }
 
