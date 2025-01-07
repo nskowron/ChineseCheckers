@@ -80,7 +80,10 @@ public class GameRequestMediator implements Runnable
 
                     Player player = (Player) request.getData();
                     gameEndPoint.setPlayer(player);
-
+                    Platform.runLater(() -> 
+                    {
+                        gameEndPoint.getGameUI().setPlayerLabelText("You are " + player.getColor() + " (" + player.getId() + ")");
+                    });
                     break;
 
                 case "GAME_START":

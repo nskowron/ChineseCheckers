@@ -23,6 +23,7 @@ public class GameUI
     private Set<GraphicNode> nodeSet;
 
     private Label currentPlayerLabel;
+    private Label playerLabel;
     private Button endTurnButton;
     private Button moveButton;
     private TextArea systemOutputArea;
@@ -86,6 +87,11 @@ public class GameUI
         }
     }
 
+    public void setPlayerLabelText(String text)
+    {
+        playerLabel.setText(text);
+    }
+
     public void setCurrentLabelText(String playerTurn) 
     {
         currentPlayerLabel.setText("Current Player: " + playerTurn);
@@ -135,7 +141,7 @@ public class GameUI
         systemOutputArea.setStyle("-fx-font-family: Consolas; " +
                                 "-fx-font-size: 14px; " +
                                 "-fx-text-fill: black;");
-        systemOutputArea.setPrefHeight(800);
+        systemOutputArea.setPrefHeight(830);
 
         rightVbox.getChildren().add(systemOutputArea);
 
@@ -151,15 +157,22 @@ public class GameUI
 
         rightVbox.getChildren().add(grid);
 
-        BorderPane borderPane = new BorderPane();
+        playerLabel = new Label("You are: ");
+        playerLabel.setFont(Font.font("Arial", 18));
+        playerLabel.setTextFill(Color.WHITE);
+
+        VBox boardAndPlayer = new VBox();
+        boardAndPlayer.setStyle("-fx-background-color: rgb(50, 50, 50); -fx-padding: 10;");
+        boardAndPlayer.getChildren().addAll(playerLabel, boardGridPane);
 
         HBox hbox = new HBox();
         hbox.setSpacing(20);
         hbox.setPadding(new Insets(0, 0, 0, 20));
         hbox.setStyle("-fx-background-color: rgb(50, 50, 50);");
 
-        hbox.getChildren().addAll(boardGridPane, rightVbox);
-        
+        hbox.getChildren().addAll(boardAndPlayer, rightVbox);
+
+        BorderPane borderPane = new BorderPane();
         borderPane.setCenter(hbox);
         borderPane.setStyle("-fx-background-color: rgb(50, 50, 50);");
 
