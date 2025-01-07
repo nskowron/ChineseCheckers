@@ -262,7 +262,8 @@ public class ClientHandler implements Runnable
 
                         if(won)
                         {
-                            send(new Request("WON", player));
+                            requestHandler.get("END_TURN").run(null);
+                            send(new Request("WON", player)); // or broadcast?
                         }
                     }
                 }

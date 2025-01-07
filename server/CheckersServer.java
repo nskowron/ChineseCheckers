@@ -27,12 +27,12 @@ public class CheckersServer
     public static void main(final String[] args) 
     {
         IBoard board;
-        IValidityChecker validator;
+        IMoveChecker validator;
         try
-        {
+        {    // Will depend on the argument
             File jsonStarFile = new File("data/star.json");
-            validator = new ValidityChecker(); // Will depend on the argument
             board = new Board(jsonStarFile);
+            validator = new MoveChecker(board);
         }
         catch(IOException e)
         {
