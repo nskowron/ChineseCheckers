@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import shared.Player;
+import shared.Request;
+
 public class CheckersServer 
 {
     private static final int PORT = 12345;
@@ -16,12 +19,14 @@ public class CheckersServer
     private static ArrayList<ServerPlayer> connectedClients = new ArrayList<>();
     private static Game game = null;
 
-    private static Condition everyoneReady = new Condition();
+    private static boolean everyoneReady = false;
+    private static Condition gameStarted = new Condition();
 
     private static Logger LOGGER = Logger.getLogger("Server");
 
     public static void main(final String[] args) 
     {
+        System.out.println(Boolean.FALSE instanceof Boolean);
         try(ServerSocket serverSocket = new ServerSocket(PORT)) 
         {
             LOGGER.info("Server is running on port " + PORT + "...");
@@ -29,10 +34,10 @@ public class CheckersServer
             IValidityChecker validator = new ValidityChecker(); // Will depend on the argument
             IBoard board = new Board();
 
-            synchronized(everyoneReady)
+            synchronized(gameStarted)
             {
                 Thread acceptance = new Thread(() -> {
-                    while(true)
+                    while(!gameStarted.met)
                     {
                         if(connectedClients.size() < 6)
                         {
@@ -43,20 +48,20 @@ public class CheckersServer
 
                                 synchronized(connectedClients)
                                 {
-                                    GamePlayer player = new GamePlayer(clientIdCounter);
-                                    ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, everyoneReady);
-                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, false);
+                                    everyoneReady = false;
 
-                                    everyoneReady.met = false;
+                                    Player player = new Player(clientIdCounter);
+                                    ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
+                                    Thread clientThread = new Thread(client);
+                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread, false);
 
                                     connectedClients.add(connectedClient);
                                     ++clientIdCounter;
 
-                                    Thread clientThread = new Thread(client);
                                     clientThread.start();
                                 }
                             }
-                            catch(IOException e){ LOGGER.severe(e.getMessage()); }
+                            catch(IOException e){ LOGGER.severe(e.getMessage()); try{ Thread.sleep(1000); }catch( InterruptedException f ){}}
                         }
                         else
                         {
@@ -68,7 +73,7 @@ public class CheckersServer
 
                 while(true)
                 {
-                    while(everyoneReady.met == false)
+                    while(everyoneReady == false)
                     {
                         try{ Thread.sleep(1000); }catch( InterruptedException e ){}
                     }
@@ -76,15 +81,17 @@ public class CheckersServer
                     {
                         synchronized(connectedClients)
                         {
-                            List<GamePlayer> players = new ArrayList<>();
+                            LOGGER.info("trying to create game");
+                            List<Player> players = new ArrayList<>();
                             for(ServerPlayer client : connectedClients)
                             {
-                                players.add((GamePlayer)client.gamePlayer);
+                                players.add(client.gamePlayer);
                             }
                             game = new Game(validator, board, players);
+                            LOGGER.info("succeeded");
 
                             // Succeeded at creating game
-                            acceptance.stop();
+                            acceptance.interrupt();
                             break;
                         }
                     }
@@ -93,9 +100,21 @@ public class CheckersServer
                         try{ Thread.sleep(1000); }catch( InterruptedException f ){}
                     }
                 }
+
+                gameStarted.met = true;
+                LOGGER.info("Game has started");
             }
-            LOGGER.info("Game has started");
             // ClientThreads wake up
+            // Wait for them?
+            // yup
+            for(ServerPlayer client : connectedClients)
+            {
+                try
+                {
+                    client.clientThread.join();
+                }
+                catch(InterruptedException e) {}
+            }
         } 
         catch(IOException e) 
         {
@@ -112,21 +131,22 @@ public class CheckersServer
     {
         synchronized(connectedClients)
         {
-            Boolean startGame = true;
+            int[] players = {0, connectedClients.size()};
             for(ServerPlayer client : connectedClients)
             {
-                if(client.ready == false)
-                {
-                    startGame = false;
-                }
-
                 if(client.id == id)
                 {
                     client.ready = ready;
-                    return;
+                }
+
+                if(client.ready)
+                {
+                    players[0] += 1;
                 }
             }
-            everyoneReady.met = startGame;
+            everyoneReady = players[0] == players[1];
+
+            broadcast(new Request("WAITING", players));
         }
     }
 
@@ -139,8 +159,12 @@ public class CheckersServer
                 if(connectedClients.get(i).id == id)
                 {
                     connectedClients.remove(i);
-                    LOGGER.info("Client " + i + " removed.");
-                    // probably do sth else
+                    LOGGER.info("Client " + id + " removed.");
+
+                    if(gameStarted.met)
+                    {
+                        broadcast(new Request("ERROR", new Error("Client " + id + " disconnected")));
+                    }
 
                     return;
                 }
@@ -148,20 +172,13 @@ public class CheckersServer
         }
     }
 
-    public static void broadcastUpdate()
+    public static void broadcast(Request request)
     {
         synchronized(connectedClients)
         {
             for(ServerPlayer client : connectedClients)
             {
-                try
-                {
-                    client.playerClient.sendUpdate();
-                }
-                catch(IOException e)
-                {
-                    LOGGER.severe("Client " + client.id + e.getMessage());
-                }
+                client.playerClient.send(request);
             }
         }
     }

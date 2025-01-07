@@ -4,16 +4,14 @@ import shared.Player;
 
 import java.io.Serializable;
 
-import javafx.scene.paint.Color;
-
 public class Piece implements Serializable
 {
     private final Player owner;
-    private final Color color;
+    private final String color;
 
-    public Piece(Color color, Player owner) throws IllegalArgumentException
+    public Piece(String color, Player owner) throws IllegalArgumentException
     {
-        if(owner.getColor() != color)
+        if(!owner.getColor().equals(color))
         {
             throw new IllegalArgumentException("Player is of different color");
         }
@@ -27,7 +25,7 @@ public class Piece implements Serializable
         return owner;
     }
 
-    public Color getColor()
+    public String getColor()
     {
         return color;
     }

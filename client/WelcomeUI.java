@@ -79,9 +79,7 @@ public class WelcomeUI
             {
                 try
                 {
-                    Request request = Request.READY;
-                    request.setData(true);
-                    requestMediator.sendRequest(request);
+                    requestMediator.sendRequest(new Request("READY", Boolean.TRUE));
                 }
                 catch (IOException e)
                 {
@@ -95,9 +93,7 @@ public class WelcomeUI
             {
                 try
                 {
-                    Request request = Request.READY;
-                    request.setData(false);
-                    requestMediator.sendRequest(request);
+                    requestMediator.sendRequest(new Request("READY", Boolean.FALSE));
                 }
                 catch (IOException e)
                 {

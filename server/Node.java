@@ -4,18 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.paint.Color;
-
 public class Node implements Serializable
 {
     public final int[] id;
-    public final Color colorStarting;
-    public final Color colorTarget;
+    public final String colorStarting;
+    public final String colorTarget;
 
     private Piece placeholder;
     private List<Node> neighbors;
 
-    public Node(int[] id, Color colorStarting, Color colorTarget) 
+    public Node(int[] id, String colorStarting, String colorTarget) 
     {
         this.id = id;
         this.colorStarting = colorStarting;
@@ -30,7 +28,7 @@ public class Node implements Serializable
 
     public Node(int[] id)
     {
-        this(id, Color.rgb(50, 50, 50), Color.rgb(50, 50, 50));
+        this(id, "DEFAULT", "DEFAULT");
     }
 
     public void addNeighbor(int idx, Node neighbor) 

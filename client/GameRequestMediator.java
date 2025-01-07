@@ -1,5 +1,6 @@
 package client;
 
+import shared.ColorTranslator;
 import shared.GameState;
 import shared.Player;
 import shared.Request;
@@ -9,6 +10,7 @@ import java.net.*;
 import java.util.List;
 import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 public class GameRequestMediator implements Runnable 
@@ -68,26 +70,26 @@ public class GameRequestMediator implements Runnable
         try
         {   // REMEMBER TO USE unlock() FOR GAME UI AFTER EACH MOVE, UI IS LOCKED EVERY TIME GET MOVES OR MOVE IS SENT
             // TODO Other requests?
-            switch (request) 
+            switch (request.getType()) 
             {
-                case GREET:
+                case "GREET":
 
                     Player player = (Player) request.getData();
                     gameEndPoint.setPlayer(player);
 
                     break;
 
-                case GAME_START:
+                case "GAME_START":
 
-                    gameEndPoint.startGame();
+                    Platform.runLater(() -> {gameEndPoint.startGame();}); // TO TEZ NA TERAZ BC IM IMPATIENT ale mozesz to robic w ui controllerze np, to by mialo wiecej sensu
                     gameEndPoint.lock();
 
                     GameState startState = (GameState) request.getData();
 
-                    for(Map.Entry<int[], Color> entry : startState.board.entrySet())
+                    for(Map.Entry<int[], String> entry : startState.board.entrySet())
                     {
                         int[] key = entry.getKey();   
-                        Color color = entry.getValue();
+                        Color color = ColorTranslator.get(entry.getValue());
                         GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
                         if(node != null)
                         {
@@ -99,7 +101,7 @@ public class GameRequestMediator implements Runnable
                     {
                         gameEndPoint.setMyTurn(true);
                         
-                        if(startState.won)
+                        if(startState.won != null && gameEndPoint.getPlayer().getId() == startState.won.getId())
                         {
                             gameEndPoint.won();
                         }
@@ -112,7 +114,7 @@ public class GameRequestMediator implements Runnable
                     gameEndPoint.unlock();
                     break;
 
-                case GET_MOVES:
+                case "GET_MOVES":
 
                     List<int[]> nodes = (List<int[]>) request.getData();
                     for(int[] nodeId : nodes)
@@ -124,20 +126,20 @@ public class GameRequestMediator implements Runnable
 
                     break;
 
-                case WAITING:
+                case "WAITING":
                     int[] data = (int[]) request.getData();
-                    gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);
+                    Platform.runLater(() -> {gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);}); // PODOBNIE TRZEBA WSZEDZIE DLA NIE-GLOWNYCH THREADOW ale nie chce ci zmieniac
 
                     break;
 
-                case UPDATE:
+                case "UPDATE":
 
                     GameState state = (GameState) request.getData();
 
-                    for(Map.Entry<int[], Color> entry : state.board.entrySet())
+                    for(Map.Entry<int[], String> entry : state.board.entrySet())
                     {
                         int[] key = entry.getKey();   
-                        Color color = entry.getValue();
+                        Color color = ColorTranslator.get(entry.getValue());
                         GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
                         if(node != null)
                         {
@@ -150,7 +152,7 @@ public class GameRequestMediator implements Runnable
                         gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
                         gameEndPoint.setMyTurn(true);
                         
-                        if(state.won)
+                        if(state.won != null && gameEndPoint.getPlayer().getId() == state.won.getId())
                         {
                             gameEndPoint.won();
                         }
@@ -163,6 +165,10 @@ public class GameRequestMediator implements Runnable
 
                     gameEndPoint.unlock();
 
+                    break;
+
+                case "ERROR":
+                    System.out.println(((Error)request.getData()).getMessage());
                     break;
 
                 default:

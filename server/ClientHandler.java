@@ -1,6 +1,7 @@
 package server;
 
 import shared.*;
+import utils.Condition;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,15 +14,17 @@ public class ClientHandler implements Runnable
     private final int id;
     private final Socket clientSocket;
     private final Player player;
-    private Object gameStarted;
+    private Condition gameStarted;
 
-    private Map<Request, RequestRunnable> requestHandler;
+    private Map<String, RequestRunnable> requestHandler;
+    ObjectOutputStream out;
+    ObjectInputStream in;
 
     private final Logger LOGGER;
 
     private boolean running;
 
-    public ClientHandler(int id, Socket clientSocket, Player player, Object gameStarted) 
+    public ClientHandler(int id, Socket clientSocket, Player player, Condition gameStarted) 
     {
         this.id = id;
         this.clientSocket = clientSocket;
@@ -29,11 +32,12 @@ public class ClientHandler implements Runnable
         this.gameStarted = gameStarted;
 
         this.requestHandler = null;
+        this.out = null;
+        this.in = null;
 
         this.running = false;
 
         LOGGER = Logger.getLogger("ServerPlayer " + player.getId());
-
         LOGGER.info("Client handler created");
     }
     
@@ -41,69 +45,72 @@ public class ClientHandler implements Runnable
     public void run() 
     {
         running = true;
-        try(ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) 
+        try
         {
-            requestHandler = getDefaultRequestHandler(out, in);
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
+        }
+        catch(IOException e) 
+        {
+            disconnect(false);
+        }
 
-            Thread readiness = new Thread(() -> {
-                while(running)
-                {
-                    try
-                    {
-                        Request request = (Request)in.readObject();
-                        if(request == Request.READY)
-                        {
-                            requestHandler.get(Request.READY).run(request);
-                        }
-                        else
-                        {
-                            Request error = Request.ERROR;
-                            error.setData(new Error("Game has not started yet"));
-                            out.writeObject(error);
-                        }
-                    }
-                    catch(EOFException e)
-                    {
-                        disconnect(true);
-                    }
-                    catch(IOException | ClassNotFoundException e)
-                    {
-                        disconnect(false);
-                    }
-                }
-            });
+        requestHandler = getDefaultRequestHandler();
+        requestHandler.get("GREET").run(null);
 
-            readiness.start();
-            synchronized(gameStarted){}
-            readiness.stop(); // I know the risk
-            
-            while(running)
+        Thread readiness = new Thread(() -> {
+            while(!gameStarted.met)
             {
-                Request request = (Request)in.readObject();
-                RequestRunnable action = requestHandler.get(request);
-                if(action != null)
+                Request request = receive();
+                if(request.getType().equals("READY"))
                 {
-                    synchronized(this)
+                    requestHandler.get("READY").run(request.getData());
+                }
+                else if(gameStarted.met) // ugly but works
+                {
+                    RequestRunnable action = requestHandler.get(request.getType());
+                    if(action != null)
                     {
-                        action.run(request);
+                        synchronized(this)
+                        {
+                            action.run(request.getData());
+                        }
                     }
+                    else
+                    {
+                        send(new Request("ERROR", new Error("Non-handled request")));
+                    }
+
+                    break;
                 }
                 else
                 {
-                    Request error = Request.ERROR;
-                    error.setData("Non-handled request");
-                    out.writeObject(error);
+                    send(new Request("ERROR", new Error("Game has not started yet")));
                 }
             }
-        }
-        catch(EOFException e)
+        });
+
+        readiness.start();
+        synchronized(gameStarted){}
+        readiness.interrupt(); // as a matter of fact i did not know the risk
+
+        requestHandler.get("GAME_START").run(null);
+        
+        while(running)
         {
-            disconnect(true);
-        }
-        catch(IOException | ClassNotFoundException e) 
-        {
-            disconnect(false);
+            Request request = receive();
+            RequestRunnable action = requestHandler.get(request.getType());
+            if(action != null)
+            {
+                synchronized(this)
+                {
+                    action.run(request.getData());
+                }
+            }
+            else
+            {
+                send(new Request("ERROR", new Error("Non-handled request")));
+            }
         }
 
         LOGGER.info("ClientHandler died");
@@ -123,106 +130,166 @@ public class ClientHandler implements Runnable
         }
         
         CheckersServer.removeClient(id);
-        try{ clientSocket.close(); }catch( IOException e ){}
-    }
-
-    public void sendUpdate() throws IOException
-    {
-        if(requestHandler != null)
+        try
         {
-            try{ requestHandler.get(Request.UPDATE).run(Request.UPDATE); }catch( ClassNotFoundException e){}
+            clientSocket.close();
+            in.close();
+            out.close();
+        }
+        catch( IOException e )
+        {
+            LOGGER.severe("Couldn't close streams");
         }
     }
 
-    private Map<Request, RequestRunnable> getDefaultRequestHandler(ObjectOutputStream out, ObjectInputStream in)
+    public void send(Request request)
     {
-        Map<Request, RequestRunnable> requestHandler = new HashMap<>();
+        LOGGER.info("sending " + request);
+        LOGGER.info("data: " + request.getData());
+        try
+        {
+            out.writeObject(request);
+        }
+        catch(EOFException e)
+        {
+            disconnect(true);
+        }
+        catch(IOException e)
+        {
+            disconnect(false);
+        }
+    }
 
-        requestHandler.put(Request.GREET, (Request greet) -> {
-            greet.setData(player);
-            out.writeObject(greet);
+    public Request receive()
+    {
+        try
+        {
+            synchronized(in)
+            {
+                Request request = (Request)in.readObject();
+                LOGGER.info("receiving " + request);
+                return request;
+            }
+        }
+        catch(EOFException e)
+        {
+            LOGGER.info("EOFFF");
+            disconnect(true);
+            return null;
+        }
+        catch(IOException | ClassNotFoundException e)
+        {
+            LOGGER.info("IOOO");
+            disconnect(false);
+            return null;
+        }
+    }
+
+    private Map<String, RequestRunnable> getDefaultRequestHandler()
+    {
+        Map<String, RequestRunnable> requestHandler = new HashMap<>();
+
+        requestHandler.put("GREET", (Object greet) -> {
+            send(new Request("GREET", player));
         });
 
-        requestHandler.put(Request.END_TURN, (Request end_turn) -> {
+        requestHandler.put("READY", (Object ready) -> {
+            if(ready instanceof Boolean)
+            {
+                synchronized(CheckersServer.class)
+                {
+                    CheckersServer.setReady((Boolean)ready, id);
+                }
+            }
+            else
+            {
+                send(new Request("ERROR", new Error("Unknown type")));
+            }
+        });
+
+        requestHandler.put("GAME_START", (Object start) -> {
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                send(new Request("GAME_START", game.getState()));
+            }
+        });
+
+        requestHandler.put("UPDATE", (Object update) -> {
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                send(new Request("UPDATE", game.getState()));
+            }
+        });
+
+        requestHandler.put("ACKNOWLEDGE", (Object ack) -> {
+            LOGGER.info("Acknowledged");
+        });
+
+        requestHandler.put("ERROR", (Object error) -> {
+            if(error instanceof Error)
+            {
+                LOGGER.severe(((Error)error).getMessage());
+            }
+        });
+
+        requestHandler.put("GET_MOVES", (Object moves) -> {
+            if(moves instanceof int[])
+            {
+                synchronized(CheckersServer.class)
+                {
+                    Game game = CheckersServer.getGame();
+                    send(new Request("GET_MOVES", game.getValidMoves(player, (int[])moves)));
+                }
+            }
+            else
+            {
+                send(new Request("ERROR", new Error("Unknown type")));
+            }
+        });
+
+        requestHandler.put("MOVE", (Object move) -> {
+            if(move instanceof Move)
+            {
+                try
+                {
+                    synchronized(CheckersServer.class)
+                    {
+                        Game game = CheckersServer.getGame();
+                        Boolean won = game.move(player, (Move)move);
+                        CheckersServer.broadcast(new Request("UPDATE", game.getState()));
+
+                        if(won)
+                        {
+                            send(new Request("WON", player));
+                        }
+                    }
+                }
+                catch(IllegalAccessError e)
+                {
+                    send(new Request("ERROR", e));
+                }
+            }
+            else
+            {
+                send(new Request("ERROR", new Error("Unknown type")));
+            }
+        });
+
+        requestHandler.put("END_TURN", (Object end_turn) -> {
             try
             {
                 synchronized(CheckersServer.class)
                 {
                     Game game = CheckersServer.getGame();
                     game.endTurn(player);
-                    end_turn.setData(game.getCurrentTurn());
+                    CheckersServer.broadcast(new Request("UPDATE", game.getState()));
                 }
-                out.writeObject(end_turn);
-
-                CheckersServer.broadcastUpdate();
             }
             catch(IllegalAccessError e)
             {
-                Request error = Request.ERROR;
-                error.setData(e);
-                out.writeObject(error);
-            }
-        });
-
-        requestHandler.put(Request.UPDATE, (Request update) -> {
-            synchronized(CheckersServer.class)
-            {
-                Game game = CheckersServer.getGame();
-                update.setData(new GameState(game.getBoard().getNodes(), game.getCurrentTurn(), player.didWin()));
-            }
-            out.writeObject(update);
-        });
-
-        requestHandler.put(Request.ACKNOWLEDGE, (Request ack) -> {
-        });
-
-        requestHandler.put(Request.ERROR, (Request error) -> {
-            LOGGER.severe(((Error)error.getData()).getMessage());
-        });
-
-        requestHandler.put(Request.READY, (Request ready) -> {
-            if(ready.getData() != null)
-            {
-                synchronized(CheckersServer.class)
-                {
-                    CheckersServer.setReady((Boolean)ready.getData(), id);
-                }
-                out.writeObject(ready);
-            }
-            else
-            {
-                Request error = Request.ERROR;
-                error.setData(new Error("Cannot set readiness to null"));
-                out.writeObject(error);
-            }
-        });
-
-        requestHandler.put(Request.GET_MOVES, (Request moves) -> {
-            synchronized(CheckersServer.class)
-            {
-                Game game = CheckersServer.getGame();
-                moves.setData(game.getValidMoves(player, (int[])moves.getData()));
-            }
-            out.writeObject(moves);
-        });
-
-        requestHandler.put(Request.MOVE, (Request move) -> {
-            try
-            {
-                synchronized(CheckersServer.class)
-                {
-                    Game game = CheckersServer.getGame();
-                    game.move(player, (Move)move.getData());
-                }
-                out.writeObject(move);
-
-                CheckersServer.broadcastUpdate();
-            }
-            catch(IllegalAccessError e)
-            {
-                Request error = Request.ERROR;
-                error.setData(e);
-                out.writeObject(error);
+                send(new Request("ERROR", e));
             }
         });
 
