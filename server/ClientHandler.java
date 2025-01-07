@@ -1,6 +1,7 @@
 package server;
 
 import shared.*;
+import utils.Condition;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,7 +14,7 @@ public class ClientHandler implements Runnable
     private final int id;
     private final Socket clientSocket;
     private final Player player;
-    private Object gameStarted;
+    private Condition gameStarted;
 
     private Map<String, RequestRunnable> requestHandler;
     ObjectOutputStream out;
@@ -23,7 +24,7 @@ public class ClientHandler implements Runnable
 
     private boolean running;
 
-    public ClientHandler(int id, Socket clientSocket, Player player, Object gameStarted) 
+    public ClientHandler(int id, Socket clientSocket, Player player, Condition gameStarted) 
     {
         this.id = id;
         this.clientSocket = clientSocket;
@@ -58,17 +59,32 @@ public class ClientHandler implements Runnable
         requestHandler.get("GREET").run(null);
 
         Thread readiness = new Thread(() -> {
-            while(running)
+            while(!gameStarted.met)
             {
                 Request request = receive();
                 if(request.getType().equals("READY"))
                 {
-                    LOGGER.info("here2");
                     requestHandler.get("READY").run(request.getData());
+                }
+                else if(gameStarted.met) // ugly but works
+                {
+                    RequestRunnable action = requestHandler.get(request.getType());
+                    if(action != null)
+                    {
+                        synchronized(this)
+                        {
+                            action.run(request.getData());
+                        }
+                    }
+                    else
+                    {
+                        send(new Request("ERROR", new Error("Non-handled request")));
+                    }
+
+                    break;
                 }
                 else
                 {
-                    LOGGER.info("here1");
                     send(new Request("ERROR", new Error("Game has not started yet")));
                 }
             }
@@ -77,6 +93,8 @@ public class ClientHandler implements Runnable
         readiness.start();
         synchronized(gameStarted){}
         readiness.interrupt(); // as a matter of fact i did not know the risk
+
+        requestHandler.get("GAME_START").run(null);
         
         while(running)
         {
@@ -146,17 +164,22 @@ public class ClientHandler implements Runnable
     {
         try
         {
-            Request request = (Request)in.readObject();
-            LOGGER.info("receiving " + request);
-            return request;
+            synchronized(in)
+            {
+                Request request = (Request)in.readObject();
+                LOGGER.info("receiving " + request);
+                return request;
+            }
         }
         catch(EOFException e)
         {
+            LOGGER.info("EOFFF");
             disconnect(true);
             return null;
         }
         catch(IOException | ClassNotFoundException e)
         {
+            LOGGER.info("IOOO");
             disconnect(false);
             return null;
         }
@@ -170,19 +193,25 @@ public class ClientHandler implements Runnable
             send(new Request("GREET", player));
         });
 
-        requestHandler.put("END_TURN", (Object end_turn) -> {
-            try
+        requestHandler.put("READY", (Object ready) -> {
+            if(ready instanceof Boolean)
             {
                 synchronized(CheckersServer.class)
                 {
-                    Game game = CheckersServer.getGame();
-                    game.endTurn(player);
-                    CheckersServer.broadcast(new Request("UPDATE", game.getState()));
+                    CheckersServer.setReady((Boolean)ready, id);
                 }
             }
-            catch(IllegalAccessError e)
+            else
             {
-                send(new Request("ERROR", e));
+                send(new Request("ERROR", new Error("Unknown type")));
+            }
+        });
+
+        requestHandler.put("GAME_START", (Object start) -> {
+            synchronized(CheckersServer.class)
+            {
+                Game game = CheckersServer.getGame();
+                send(new Request("GAME_START", game.getState()));
             }
         });
 
@@ -202,24 +231,6 @@ public class ClientHandler implements Runnable
             if(error instanceof Error)
             {
                 LOGGER.severe(((Error)error).getMessage());
-            }
-        });
-
-        requestHandler.put("READY", (Object ready) -> {
-            LOGGER.info("here3");
-            if(ready instanceof Boolean)
-            {
-                LOGGER.info("here4");
-                synchronized(CheckersServer.class)
-                {
-                    CheckersServer.setReady((Boolean)ready, id);
-                }
-            }
-            else
-            {
-                LOGGER.info("here5");
-                send(new Request("ERROR", new Error("Unknown type")));
-                LOGGER.info("here6");
             }
         });
 
@@ -263,6 +274,22 @@ public class ClientHandler implements Runnable
             else
             {
                 send(new Request("ERROR", new Error("Unknown type")));
+            }
+        });
+
+        requestHandler.put("END_TURN", (Object end_turn) -> {
+            try
+            {
+                synchronized(CheckersServer.class)
+                {
+                    Game game = CheckersServer.getGame();
+                    game.endTurn(player);
+                    CheckersServer.broadcast(new Request("UPDATE", game.getState()));
+                }
+            }
+            catch(IllegalAccessError e)
+            {
+                send(new Request("ERROR", e));
             }
         });
 

@@ -103,7 +103,7 @@ public class Game implements Serializable
                     return;
                 }
             }
-            throw new IllegalAccessError("The game is finished");
+            throw new IllegalAccessError("There are no more players");
         }
         throw new IllegalAccessError("It's not the player's turn");
     }

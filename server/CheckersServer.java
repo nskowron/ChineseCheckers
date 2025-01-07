@@ -48,16 +48,16 @@ public class CheckersServer
 
                                 synchronized(connectedClients)
                                 {
+                                    everyoneReady = false;
+
                                     Player player = new Player(clientIdCounter);
                                     ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
-                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, false);
-
-                                    everyoneReady = false;
+                                    Thread clientThread = new Thread(client);
+                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread, false);
 
                                     connectedClients.add(connectedClient);
                                     ++clientIdCounter;
 
-                                    Thread clientThread = new Thread(client);
                                     clientThread.start();
                                 }
                             }
@@ -106,6 +106,15 @@ public class CheckersServer
             }
             // ClientThreads wake up
             // Wait for them?
+            // yup
+            for(ServerPlayer client : connectedClients)
+            {
+                try
+                {
+                    client.clientThread.join();
+                }
+                catch(InterruptedException e) {}
+            }
         } 
         catch(IOException e) 
         {

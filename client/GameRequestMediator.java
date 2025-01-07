@@ -81,7 +81,7 @@ public class GameRequestMediator implements Runnable
 
                 case "GAME_START":
 
-                    gameEndPoint.startGame();
+                    Platform.runLater(() -> {gameEndPoint.startGame();}); // TO TEZ NA TERAZ BC IM IMPATIENT ale mozesz to robic w ui controllerze np, to by mialo wiecej sensu
                     gameEndPoint.lock();
 
                     GameState startState = (GameState) request.getData();
@@ -101,7 +101,7 @@ public class GameRequestMediator implements Runnable
                     {
                         gameEndPoint.setMyTurn(true);
                         
-                        if(gameEndPoint.getPlayer().getId() == startState.won.getId())
+                        if(startState.won != null && gameEndPoint.getPlayer().getId() == startState.won.getId())
                         {
                             gameEndPoint.won();
                         }
@@ -152,7 +152,7 @@ public class GameRequestMediator implements Runnable
                         gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
                         gameEndPoint.setMyTurn(true);
                         
-                        if(gameEndPoint.getPlayer().getId() == state.won.getId())
+                        if(state.won != null && gameEndPoint.getPlayer().getId() == state.won.getId())
                         {
                             gameEndPoint.won();
                         }
