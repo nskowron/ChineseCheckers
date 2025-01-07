@@ -52,6 +52,10 @@ public class GameRequestMediator implements Runnable
         catch (IOException | ClassNotFoundException e) 
         {
             e.printStackTrace();
+            Platform.runLater(() -> 
+            {
+                gameEndPoint.getGameUI().appendToSystemOutput(e.getMessage());
+            });
         }
     }
 
@@ -81,90 +85,98 @@ public class GameRequestMediator implements Runnable
 
                 case "GAME_START":
 
-                    Platform.runLater(() -> {gameEndPoint.startGame();}); // TO TEZ NA TERAZ BC IM IMPATIENT ale mozesz to robic w ui controllerze np, to by mialo wiecej sensu
-                    gameEndPoint.lock();
-
+                    gameEndPoint.lock(); //LOCK FIRST
                     GameState startState = (GameState) request.getData();
-
-                    for(Map.Entry<int[], String> entry : startState.board.entrySet())
+                    Platform.runLater(() -> 
                     {
-                        int[] key = entry.getKey();   
-                        Color color = ColorTranslator.get(entry.getValue());
-                        GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
-                        if(node != null)
+                        gameEndPoint.startGame();
+
+                        for(Map.Entry<int[], String> entry : startState.board.entrySet())
                         {
-                            node.setFill(color);
+                            int[] key = entry.getKey();   
+                            Color color = ColorTranslator.get(entry.getValue());
+                            GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
+                            if(node != null)
+                            {
+                                node.setFill(color);
+                            }
                         }
-                    }
 
-                    if(gameEndPoint.getPlayer().getId() == startState.currentTurn.getId())
-                    {
-                        gameEndPoint.setMyTurn(true);
-                        
-                        if(startState.won != null && gameEndPoint.getPlayer().getId() == startState.won.getId())
+                        if(gameEndPoint.getPlayer().getId() == startState.currentTurn.getId())
                         {
-                            gameEndPoint.won();
+                            gameEndPoint.setMyTurn(true);
+                            
+                            if(startState.won != null && gameEndPoint.getPlayer().getId() == startState.won.getId())
+                            {
+                                gameEndPoint.won();
+                            }
                         }
-                    }
-                    else
-                    {
-                        gameEndPoint.setMyTurn(false);
-                    }
+                        else
+                        {
+                            gameEndPoint.setMyTurn(false);
+                        }
 
-                    gameEndPoint.unlock();
+                        gameEndPoint.unlock();
+                    });
                     break;
 
                 case "GET_MOVES":
 
-                    List<int[]> nodes = (List<int[]>) request.getData();
-                    for(int[] nodeId : nodes)
+                    List<int[]> nodes = (List<int[]>) request.getData(); // THIS MAY NOT WORK...
+                    Platform.runLater(() -> 
                     {
-                        gameEndPoint.getGameUI().highlightNode(nodeId);
-                    }
+                        for(int[] nodeId : nodes)
+                        {
+                            gameEndPoint.getGameUI().highlightNode(nodeId);
+                        }
 
-                    gameEndPoint.unlock();
-
+                        gameEndPoint.unlock();
+                    });
                     break;
 
                 case "WAITING":
                     int[] data = (int[]) request.getData();
-                    Platform.runLater(() -> {gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);}); // PODOBNIE TRZEBA WSZEDZIE DLA NIE-GLOWNYCH THREADOW ale nie chce ci zmieniac
-
+                    Platform.runLater(() -> 
+                    {
+                        gameEndPoint.getWelcomeUI().updatePlayerCount(data[0], data[1]);
+                    });
                     break;
 
                 case "UPDATE":
 
                     GameState state = (GameState) request.getData();
 
-                    for(Map.Entry<int[], String> entry : state.board.entrySet())
+                    Platform.runLater(() -> 
                     {
-                        int[] key = entry.getKey();   
-                        Color color = ColorTranslator.get(entry.getValue());
-                        GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
-                        if(node != null)
+                        for(Map.Entry<int[], String> entry : state.board.entrySet())
                         {
-                            node.setFill(color);
+                            int[] key = entry.getKey();   
+                            Color color = ColorTranslator.get(entry.getValue());
+                            GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
+                            if(node != null)
+                            {
+                                node.setFill(color);
+                            }
                         }
-                    }
 
-                    if(gameEndPoint.getPlayer().getId() == state.currentTurn.getId())
-                    {
-                        gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
-                        gameEndPoint.setMyTurn(true);
-                        
-                        if(state.won != null && gameEndPoint.getPlayer().getId() == state.won.getId())
+                        if(gameEndPoint.getPlayer().getId() == state.currentTurn.getId())
                         {
-                            gameEndPoint.won();
+                            gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
+                            gameEndPoint.setMyTurn(true);
+                            
+                            if(state.won != null && gameEndPoint.getPlayer().getId() == state.won.getId())
+                            {
+                                gameEndPoint.won();
+                            }
                         }
-                    }
-                    else
-                    {
-                        gameEndPoint.getGameUI().setCurrentLabelText(Integer.toString(state.currentTurn.getId()));
-                        gameEndPoint.setMyTurn(false);
-                    }
+                        else
+                        {
+                            gameEndPoint.getGameUI().setCurrentLabelText(Integer.toString(state.currentTurn.getId()));
+                            gameEndPoint.setMyTurn(false);
+                        }
 
-                    gameEndPoint.unlock();
-
+                        gameEndPoint.unlock();
+                    });
                     break;
 
                 case "ERROR":
