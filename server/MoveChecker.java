@@ -35,13 +35,13 @@ public class MoveChecker implements IMoveChecker
     @Override
     public boolean winningMove(Move move)
     {
-        return true;
+        return false;
     }
 
     public boolean jumpMove(Move move)
     {
         List<Node> neigbors1 = board.findNodeById(move.startId).getNeighbors();
-        List<Node> neigbors2 = board.findNodeById(move.startId).getNeighbors();
+        List<Node> neigbors2 = board.findNodeById(move.endId).getNeighbors();
         List<Node> commonNeighbors = new ArrayList<>();
 
         for(Node neighbor : neigbors1)
@@ -88,6 +88,7 @@ public class MoveChecker implements IMoveChecker
 
         for(int i = 0; i < 6; ++i)
         {
+
             System.out.println("recursive " + i);
             if(i == skipDirection)
             {
@@ -106,10 +107,12 @@ public class MoveChecker implements IMoveChecker
                 continue;
             }
 
+            System.out.println(startNode.getID()[0] + ", " + startNode.getID()[1] + " ; " + endNode.getID()[0] + ", " + endNode.getID()[1]);
             if(validMove(new Move(startNode.getID(), endNode.getID())))
             {
                 endIds.add(endNode.getID());
                 endIds.addAll(getValidMovesRecursive(endNode, i));
+                System.out.println("endids: " + endIds);
             }
         }
 
