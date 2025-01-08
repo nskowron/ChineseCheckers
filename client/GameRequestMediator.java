@@ -139,15 +139,15 @@ public class GameRequestMediator implements Runnable
                             }
                         }
 
+                        if(state.won != null)
+                        {
+                            gameEndPoint.appendToSystemOutput(state.won.getColor() + " just won!");
+                        }
+
                         if(gameEndPoint.getPlayer().getId() == state.currentTurn.getId())
                         {
                             gameEndPoint.getGameUI().setCurrentLabelText(" YOU! ");
                             gameEndPoint.setMyTurn(true);
-                            
-                            if(state.won != null && gameEndPoint.getPlayer().getId() == state.won.getId())
-                            {
-                                gameEndPoint.won();
-                            }
                         }
                         else
                         {
@@ -158,7 +158,13 @@ public class GameRequestMediator implements Runnable
                         gameEndPoint.unlock();
                     });
                     break;
-
+                case "WON":
+                    Platform.runLater(() -> 
+                    {
+                         gameEndPoint.won();
+                    }
+                    break;
+                    
                 case "ERROR":
                     Platform.runLater(() -> 
                     {
