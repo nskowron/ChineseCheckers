@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.lang.Error;
 
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
@@ -185,7 +186,7 @@ public class GameRequestMediator implements Runnable
                 case "ERROR":
                     Platform.runLater(() -> 
                     {
-                        gameEndPoint.getGameUI().appendToSystemOutput(new String(request.getData()));;
+                        gameEndPoint.getGameUI().appendToSystemOutput(((Error) request.getData()).getMessage());
                     });
                     break;
 
