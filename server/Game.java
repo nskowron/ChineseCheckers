@@ -92,13 +92,9 @@ public class Game implements Serializable
             System.out.println("Not the player's piece");
             validEndIds = new ArrayList<>();
         }
-        else if(players.get(currentTurn) != player)
-        {
-            validEndIds = checker.getValidMoves(beginId);
-        }
         else
         {
-            validEndIds = checker.getValidMoves(beginId);
+            validEndIds = checker.getValidMoves(player, beginId);
         }
 
         validMoves.put(beginId, validEndIds);

@@ -4,22 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import shared.Move;
+import shared.Player;
 
 public class MoveChecker implements IMoveChecker
 {
     private IBoard board;
 
+    private List<Node> visitedNodes;
+
     public MoveChecker(IBoard board)
     {
         this.board = board;
+
+        this.visitedNodes = null;
     }
 
-    public boolean validMove(Move move)
+    private boolean validMove(Player player, Move move)
     {
         Node startNode = board.findNodeById(move.startId);
         Node endNode = board.findNodeById(move.endId);
 
-        if(startNode.getPiece() == null || endNode.getPiece() != null)
+        Piece piece = startNode.getPiece();
+        if(piece != null && !piece.getColor().equals(player.getColor()))
+        {
+            return false;
+        }
+
+        if(endNode.getPiece() != null)
+        {
+            return false;
+        }
+
+        if(startNode.getColorTarget().equals(player.getColor()) && !startNode.getColorTarget().equals(player.getColor()))
         {
             return false;
         }
@@ -35,7 +51,24 @@ public class MoveChecker implements IMoveChecker
     @Override
     public boolean winningMove(Move move)
     {
-        return false;
+        Piece piece = board.findNodeById(move.startId).getPiece();
+        if(piece == null || board.findNodeById(move.endId).getColorTarget() != piece.getColor())
+        {
+            return false;
+        }
+
+        for(Node node : board.getNodes().values())
+        {
+            if(node.getColorTarget().equals(piece.getColor()))
+            {
+                if(node.getPiece() == null || !node.getPiece().getColor().equals(piece.getColor()))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public boolean jumpMove(Move move)
@@ -46,7 +79,7 @@ public class MoveChecker implements IMoveChecker
 
         for(Node neighbor : neigbors1)
         {
-            if(neigbors2.contains(neighbor))
+            if(neighbor != null && neigbors2.contains(neighbor))
             {
                 commonNeighbors.add(neighbor);
             }
@@ -55,9 +88,8 @@ public class MoveChecker implements IMoveChecker
         return commonNeighbors.size() == 1 && commonNeighbors.get(0).getPiece() != null;
     }
 
-    // add not getting out of the target nodes
     @Override
-    public List<int[]> getValidMoves(int[] beginId)
+    public List<int[]> getValidMoves(Player player, int[] beginId)
     {
         List<int[]> endIds = new ArrayList<>();
 
@@ -69,32 +101,32 @@ public class MoveChecker implements IMoveChecker
             {
                 continue;
             }
-            System.out.println(neighbor.getID()[0] + ", " + neighbor.getID()[0]);
 
-            if(validMove(new Move(beginId, neighbor.getID())))
+            if(validMove(player, new Move(beginId, neighbor.getID())))
             {
                 endIds.add(neighbor.getID());
             }
         }
 
-        endIds.addAll(getValidMovesRecursive(beginNode, -1));
+        visitedNodes = new ArrayList<>();
+        endIds.addAll(getValidMovesRecursive(player, beginNode));
 
         return endIds;
     }
 
-    private List<int[]> getValidMovesRecursive(Node startNode, int skipDirection)
+    private List<int[]> getValidMovesRecursive(Player player, Node startNode)
     {
         List<int[]> endIds = new ArrayList<>();
 
+        if(visitedNodes.contains(startNode))
+        {
+            return endIds;
+        }
+        
+        visitedNodes.add(startNode);
+
         for(int i = 0; i < 6; ++i)
         {
-
-            System.out.println("recursive " + i);
-            if(i == skipDirection)
-            {
-                continue;
-            }
-
             Node inBetween = startNode.getNeighbors().get(i);
             if(inBetween == null)
             {
@@ -107,12 +139,10 @@ public class MoveChecker implements IMoveChecker
                 continue;
             }
 
-            System.out.println(startNode.getID()[0] + ", " + startNode.getID()[1] + " ; " + endNode.getID()[0] + ", " + endNode.getID()[1]);
-            if(validMove(new Move(startNode.getID(), endNode.getID())))
+            if(validMove(player, new Move(startNode.getID(), endNode.getID())))
             {
                 endIds.add(endNode.getID());
-                endIds.addAll(getValidMovesRecursive(endNode, i));
-                System.out.println("endids: " + endIds);
+                endIds.addAll(getValidMovesRecursive(player, endNode));
             }
         }
 
