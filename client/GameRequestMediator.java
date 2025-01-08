@@ -83,44 +83,16 @@ public class GameRequestMediator implements Runnable
                     gameEndPoint.setPlayer(player);
                     Platform.runLater(() -> 
                     {
-                        gameEndPoint.getGameUI().setPlayerLabelText("You are " + player.getColor() + " (" + player.getId() + ")");
+                        gameEndPoint.getGameUI().setPlayerLabelText("You are " + " (" + player.getId() + ")");
                     });
                     break;
 
                 case "GAME_START":
 
-                    gameEndPoint.lock(); //LOCK FIRST
-                    GameState startState = (GameState) request.getData();
+                    gameEndPoint.lock(); //LOCK FIRST, WAIT FOR UPDATE
                     Platform.runLater(() -> 
                     {
                         gameEndPoint.startGame();
-
-                        for(Map.Entry<int[], String> entry : startState.board.entrySet())
-                        {
-                            int[] key = entry.getKey();   
-                            Color color = ColorTranslator.get(entry.getValue());
-                            GraphicNode node = gameEndPoint.getGameUI().findNodeById(key);
-                            if(node != null)
-                            {
-                                node.setFill(color);
-                            }
-                        }
-
-                        if(gameEndPoint.getPlayer().getId() == startState.currentTurn.getId())
-                        {
-                            gameEndPoint.setMyTurn(true);
-                            
-                            if(startState.won != null && gameEndPoint.getPlayer().getId() == startState.won.getId())
-                            {
-                                gameEndPoint.won();
-                            }
-                        }
-                        else
-                        {
-                            gameEndPoint.setMyTurn(false);
-                        }
-
-                        gameEndPoint.unlock();
                     });
                     break;
 

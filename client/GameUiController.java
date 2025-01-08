@@ -133,6 +133,7 @@ public class GameUiController
                         try
                         {
                             requestReceiver.sendRequest(new Request("GET_MOVES", firstSelectedNode.getGameId()));
+                            secondSelectedNode = null;
                         }
                         catch (IOException e)
                         {
