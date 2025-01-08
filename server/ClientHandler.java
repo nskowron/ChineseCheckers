@@ -146,7 +146,6 @@ public class ClientHandler implements Runnable
     public void send(Request request)
     {
         LOGGER.info("sending " + request.getType());
-        LOGGER.info("data: " + request.getData());
         try
         {
             out.writeObject(request);
@@ -174,13 +173,11 @@ public class ClientHandler implements Runnable
         }
         catch(EOFException e)
         {
-            LOGGER.info("EOFFF");
             disconnect(true);
             return null;
         }
         catch(IOException | ClassNotFoundException e)
         {
-            LOGGER.info("IOOO");
             disconnect(false);
             return null;
         }
@@ -238,8 +235,6 @@ public class ClientHandler implements Runnable
         requestHandler.put("GET_MOVES", (Object moves) -> {
             if(moves instanceof int[])
             {
-                int[] moveId = (int[])moves;
-                LOGGER.info("GET_MOVES called for node id: " + moveId[0] + ", " + moveId[1]);
                 synchronized(CheckersServer.class)
                 {
                     Game game = CheckersServer.getGame();

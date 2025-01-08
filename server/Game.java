@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class Game implements Serializable
 {
@@ -80,7 +79,6 @@ public class Game implements Serializable
     {
         if(validMoves.get(beginId) != null)
         {
-            System.out.println("already calculated");
             return validMoves.get(beginId);
         }
 
@@ -89,7 +87,6 @@ public class Game implements Serializable
         Piece piece = board.findNodeById(beginId).getPiece();
         if(piece == null || piece.getOwner() != player)
         {
-            System.out.println("Not the player's piece");
             validEndIds = new ArrayList<>();
         }
         else

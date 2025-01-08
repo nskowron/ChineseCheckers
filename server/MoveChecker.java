@@ -52,7 +52,10 @@ public class MoveChecker implements IMoveChecker
     public boolean winningMove(Move move)
     {
         Piece piece = board.findNodeById(move.startId).getPiece();
-        if(piece == null || board.findNodeById(move.endId).getColorTarget() != piece.getColor())
+        Node startNode = board.findNodeById(move.startId);
+        Node endNode = board.findNodeById(move.endId);
+
+        if(piece == null || endNode.getColorTarget() != piece.getColor())
         {
             return false;
         }
@@ -61,6 +64,13 @@ public class MoveChecker implements IMoveChecker
         {
             if(node.getColorTarget().equals(piece.getColor()))
             {
+                if(node == endNode)
+                {
+                    if(startNode.getColorTarget().equals(piece.getColor()))
+                    {
+                        return false;
+                    }
+                }
                 if(node.getPiece() == null || !node.getPiece().getColor().equals(piece.getColor()))
                 {
                     return false;
@@ -96,7 +106,6 @@ public class MoveChecker implements IMoveChecker
         Node beginNode = board.findNodeById(beginId);
         for(Node neighbor : beginNode.getNeighbors())
         {
-            System.out.println(neighbor);
             if(neighbor == null)
             {
                 continue;
