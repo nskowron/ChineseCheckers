@@ -90,8 +90,10 @@ public class GameRequestMediator implements Runnable
                 case "GAME_START":
 
                     gameEndPoint.lock(); //LOCK FIRST, WAIT FOR UPDATE
+                    Player playerUpdate = (Player) request.getData();
                     Platform.runLater(() -> 
                     {
+                        gameEndPoint.getGameUI().setPlayerLabelText("You are " + playerUpdate.getColor() + " (" + playerUpdate.getId() + ")");
                         gameEndPoint.startGame();
                     });
                     break;
