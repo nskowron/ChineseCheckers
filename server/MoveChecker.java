@@ -2,8 +2,6 @@ package server;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import shared.Move;
 
@@ -90,6 +88,7 @@ public class MoveChecker implements IMoveChecker
 
         for(int i = 0; i < 6; ++i)
         {
+            System.out.println("recursive " + i);
             if(i == skipDirection)
             {
                 continue;

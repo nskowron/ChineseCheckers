@@ -141,7 +141,7 @@ public class GameRequestMediator implements Runnable
 
                         if(state.won != null)
                         {
-                            gameEndPoint.appendToSystemOutput(state.won.getColor() + " just won!");
+                            gameEndPoint.getGameUI().appendToSystemOutput(state.won.getColor() + " just won!");
                         }
 
                         if(gameEndPoint.getPlayer().getId() == state.currentTurn.getId())
@@ -162,7 +162,7 @@ public class GameRequestMediator implements Runnable
                     Platform.runLater(() -> 
                     {
                          gameEndPoint.won();
-                    }
+                    });
                     break;
                     
                 case "ERROR":
