@@ -123,6 +123,7 @@ public class GameUiController
                         gameUI.appendToSystemOutput(e.getMessage());
                         unlock();
                     }
+                    return;
                 }
         
                 if(node.isHighlighted())
@@ -138,6 +139,7 @@ public class GameUiController
                             gameUI.appendToSystemOutput(e.getMessage());
                             unlock();
                         }
+                        return;
                     }
                     else
                     {
@@ -146,6 +148,7 @@ public class GameUiController
                         gameUI.clearAllHighlights();
                         secondSelectedNode.highlight();
                         firstSelectedNode.highlight();
+                        return;
                     }
                 }
             });

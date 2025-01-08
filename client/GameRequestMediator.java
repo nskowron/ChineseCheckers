@@ -183,7 +183,10 @@ public class GameRequestMediator implements Runnable
                     break;
 
                 case "ERROR":
-                    System.out.println(((Error)request.getData()).getMessage());
+                    Platform.runLater(() -> 
+                    {
+                        gameEndPoint.getGameUI().appendToSystemOutput(new String(request.getData()));;
+                    });
                     break;
 
                 default:
