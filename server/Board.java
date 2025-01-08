@@ -7,9 +7,12 @@ import utils.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.plaf.synth.SynthStyle;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -48,6 +51,7 @@ public class Board implements IBoard
             nodes.put(id, node);
         }
 
+
         for(Node node : nodes.values())
         {
             linkRecursive(node);
@@ -68,7 +72,16 @@ public class Board implements IBoard
     @Override
     public Node findNodeById(int[] id)
     {
-        return nodes.get(id);
+        for(Map.Entry<int[], Node> node : nodes.entrySet())
+        {
+            int[] key = node.getKey();
+            if(key[0] == id[0] && key[1] == id[1])
+            {
+                System.out.println("FOUND!");
+                return node.getValue();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -134,12 +147,12 @@ public class Board implements IBoard
         int y = node.id[0];
         int x = node.id[1];
         List<Node> neighbors = List.of(
-            nodes.get(new int[]{y-1, x-1}),
-            nodes.get(new int[]{y-1, x+1}),
-            nodes.get(new int[]{y, x-2}),
-            nodes.get(new int[]{y, x+2}),
-            nodes.get(new int[]{y+1, x-1}),
-            nodes.get(new int[]{y+1, x+1})
+            findNodeById(new int[]{y-1, x-1}),
+            findNodeById(new int[]{y-1, x+1}),
+            findNodeById(new int[]{y, x-2}),
+            findNodeById(new int[]{y, x+2}),
+            findNodeById(new int[]{y+1, x-1}),
+            findNodeById(new int[]{y+1, x+1})
         );
 
         node.addNeighbors(neighbors);

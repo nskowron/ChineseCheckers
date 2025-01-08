@@ -76,11 +76,18 @@ public class MoveChecker implements IMoveChecker
     @Override
     public List<int[]> getValidMoves(int[] beginId, MoveData prev)
     {
-        Set<int[]> endIds = Set.of();
+        List<int[]> endIds = new ArrayList<>();
 
         Node beginNode = board.findNodeById(beginId);
         for(Node neighbor : beginNode.getNeighbors())
         {
+            System.out.println(neighbor);
+            if(neighbor == null)
+            {
+                continue;
+            }
+            System.out.println(neighbor.getID()[0] + ", " + neighbor.getID()[0]);
+
             if(validMove(new Move(beginId, neighbor.getID()), prev))
             {
                 endIds.add(neighbor.getID());
@@ -92,9 +99,9 @@ public class MoveChecker implements IMoveChecker
         return new ArrayList<>(endIds);
     }
 
-    private Set<int[]> getValidMovesRecursive(Node startNode, MoveData prev, int skipDirection)
+    private List<int[]> getValidMovesRecursive(Node startNode, MoveData prev, int skipDirection)
     {
-        Set<int[]> endIds = Set.of();
+        List<int[]> endIds = new ArrayList<>();
 
         for(int i = 0; i < 6; ++i)
         {

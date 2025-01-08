@@ -83,6 +83,7 @@ public class Game implements Serializable
         Piece piece = board.findNodeById(beginId).getPiece();
         if(piece.getOwner() != player)
         {
+            System.out.println("Not my turn?");
             return new ArrayList<>();
         }
 
