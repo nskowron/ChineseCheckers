@@ -77,13 +77,14 @@ public class Game implements Serializable
     {
         if(validMoves.get(beginId) != null)
         {
+            System.out.println("already calculated");
             return validMoves.get(beginId);
         }
 
         List<int[]> validEndIds;
     
         Piece piece = board.findNodeById(beginId).getPiece();
-        if(piece.getOwner() != player)
+        if(piece == null || piece.getOwner() != player)
         {
             System.out.println("Not the player's piece");
             validEndIds = new ArrayList<>();
