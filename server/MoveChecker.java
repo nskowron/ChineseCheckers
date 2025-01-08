@@ -77,11 +77,11 @@ public class MoveChecker implements IMoveChecker
             {
                 endIds.add(neighbor.getID());
             }
-
-            endIds.addAll(getValidMovesRecursive(beginNode, -1));
         }
 
-        return new ArrayList<>(endIds);
+        endIds.addAll(getValidMovesRecursive(beginNode, -1));
+
+        return endIds;
     }
 
     private List<int[]> getValidMovesRecursive(Node startNode, int skipDirection)

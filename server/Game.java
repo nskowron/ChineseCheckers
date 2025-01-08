@@ -62,23 +62,15 @@ public class Game implements Serializable
             throw new IllegalAccessError("Can't move someone else's piece");
         }
 
-        MoveData thisMove = checker.checkMove(move, previousMove);
-        if(!thisMove.valid)
+        if(getValidMoves(player, move.startId).contains(move.endId))
         {
-            throw new IllegalAccessError("Invalid move");
+            board.move(move);
+            return checker.winningMove(move);
         }
         else
         {
-            board.move(move);
+            throw new IllegalAccessError("Invalid move");
         }
-        previousMove = thisMove;
-
-        if(thisMove.winning)
-        {
-            winners.add(player);
-        }
-
-        return thisMove.winning;
     }
 
     public List<int[]> getValidMoves(Player player, int[] beginId)
