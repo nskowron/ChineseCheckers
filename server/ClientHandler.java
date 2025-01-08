@@ -212,7 +212,7 @@ public class ClientHandler implements Runnable
             synchronized(CheckersServer.class)
             {
                 LOGGER.info("Player color " + player.getColor());
-                send(new Request("GAME_START", player));
+                send(new Request("GAME_START", player.getColor()));
                 requestHandler.get("UPDATE").run(null);
             }
         });
