@@ -211,7 +211,6 @@ public class ClientHandler implements Runnable
         requestHandler.put("GAME_START", (Object start) -> {
             synchronized(CheckersServer.class)
             {
-                LOGGER.info("Player color " + player.getColor());
                 send(new Request("GAME_START", player.getColor()));
                 requestHandler.get("UPDATE").run(null);
             }
@@ -262,11 +261,10 @@ public class ClientHandler implements Runnable
                     {
                         Game game = CheckersServer.getGame();
                         Boolean won = game.move(player, (Move)move);
-                        CheckersServer.broadcast(new Request("UPDATE", game.getState()));
+                        requestHandler.get("END_TURN").run(null);
 
                         if(won)
                         {
-                            requestHandler.get("END_TURN").run(null);
                             send(new Request("WON", player)); // or broadcast?
                         }
                     }

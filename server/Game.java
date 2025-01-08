@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Game implements Serializable
@@ -62,15 +63,17 @@ public class Game implements Serializable
             throw new IllegalAccessError("Can't move someone else's piece");
         }
 
-        if(getValidMoves(player, move.startId).contains(move.endId))
+        List<int[]> validEndIds = getValidMoves(player, move.startId);
+        for(int[] id : validEndIds)
         {
-            board.move(move);
-            return checker.winningMove(move);
+            if(Arrays.equals(id, move.endId))
+            {
+                board.move(move);
+                return checker.winningMove(move);
+            }
         }
-        else
-        {
-            throw new IllegalAccessError("Invalid move");
-        }
+        
+        throw new IllegalAccessError("Invalid move");
     }
 
     public List<int[]> getValidMoves(Player player, int[] beginId)

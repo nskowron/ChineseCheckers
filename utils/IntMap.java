@@ -15,6 +15,7 @@ public class IntMap <T> extends HashMap<int[], T>
             {
                 if(Arrays.equals(entry.getKey(), (int[])id))
                 {
+                    System.out.println("FOUND!1");
                     return entry.getValue();
                 }
             }

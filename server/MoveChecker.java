@@ -37,7 +37,7 @@ public class MoveChecker implements IMoveChecker
     @Override
     public boolean winningMove(Move move)
     {
-        return false;
+        return true;
     }
 
     public boolean jumpMove(Move move)
