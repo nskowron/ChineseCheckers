@@ -57,6 +57,7 @@ public class ClientHandler implements Runnable
 
         requestHandler = getDefaultRequestHandler();
         requestHandler.get("GREET").run(null);
+        requestHandler.get("READY").run(Boolean.FALSE);
 
         Thread readiness = new Thread(() -> {
             while(!gameStarted.met)
@@ -237,6 +238,8 @@ public class ClientHandler implements Runnable
         requestHandler.put("GET_MOVES", (Object moves) -> {
             if(moves instanceof int[])
             {
+                int[] moveId = (int[])moves;
+                LOGGER.info("GET_MOVES called for node id: " + moveId[0] + ", " + moveId[1]);
                 synchronized(CheckersServer.class)
                 {
                     Game game = CheckersServer.getGame();
@@ -262,7 +265,8 @@ public class ClientHandler implements Runnable
 
                         if(won)
                         {
-                            send(new Request("WON", player));
+                            requestHandler.get("END_TURN").run(null);
+                            send(new Request("WON", player)); // or broadcast?
                         }
                     }
                 }

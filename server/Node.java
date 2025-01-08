@@ -20,10 +20,6 @@ public class Node implements Serializable
         this.colorTarget = colorTarget;
 
         this.neighbors = new ArrayList<>();
-        for(int i = 0; i < 6; ++i)
-        {
-            neighbors.add(null);
-        }
     }
 
     public Node(int[] id)
@@ -36,7 +32,7 @@ public class Node implements Serializable
         this.neighbors.add(idx, neighbor);
     }
 
-    public void addNeighbors(ArrayList<Node> neighbors) 
+    public void addNeighbors(List<Node> neighbors) 
     {
         if(neighbors.size() == 6)
         {
@@ -57,6 +53,16 @@ public class Node implements Serializable
     public Piece getPiece()
     {
         return placeholder;
+    }
+
+    public String getColorStarting()
+    {
+        return colorStarting;
+    }
+
+    public String getColorTarget()
+    {
+        return colorTarget;
     }
 
     public Piece take() throws IllegalAccessError

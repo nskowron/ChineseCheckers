@@ -1,4 +1,12 @@
 {
+    "starColors": [
+      "CYAN",
+      "GREEN",
+      "RED",
+      "MAGENTA",
+      "YELLOW",
+      "BLUE"
+    ],
     "starPositions": [
       { "coordinates": [1, 13], "color": "CYAN" },
       { "coordinates": [2, 12], "color": "CYAN" },

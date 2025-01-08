@@ -1,6 +1,6 @@
 all:
-	javac -d bin server/CheckersServer.java
-	javac --module-path ./javaFX/lib --add-modules javafx.controls -d bin client/CheckersClientApp.java shared/*.java utils/*.java
+	javac --module-path ./Jackson --add-modules com.fasterxml.jackson.databind -d bin server/CheckersServer.java
+	javac --module-path ./javaFX/lib --add-modules javafx.controls -d bin client/CheckersClientApp.java utils/*.java shared/*.java
 
 clean:
 	rm -rf ./bin/client/*.class
@@ -9,7 +9,7 @@ clean:
 	rm -rf ./bin/utils/*.class
 
 runS:
-	java -cp bin server.CheckersServer
+	java --module-path ./Jackson --add-modules com.fasterxml.jackson.databind -cp bin server.CheckersServer
 
 runC:
 	java --module-path ./javaFX/lib --add-modules javafx.controls -cp bin client.CheckersClientApp

@@ -26,13 +26,23 @@ public class CheckersServer
 
     public static void main(final String[] args) 
     {
-        System.out.println(Boolean.FALSE instanceof Boolean);
+        IBoard board;
+        IMoveChecker validator;
+        try
+        {    // Will depend on the argument
+            File jsonStarFile = new File("data/star.json");
+            board = new Board(jsonStarFile);
+            validator = new MoveChecker(board);
+        }
+        catch(IOException e)
+        {
+            LOGGER.severe(e.getMessage());
+            return;
+        }
+
         try(ServerSocket serverSocket = new ServerSocket(PORT)) 
         {
             LOGGER.info("Server is running on port " + PORT + "...");
-
-            IValidityChecker validator = new ValidityChecker(); // Will depend on the argument
-            IBoard board = new Board();
 
             synchronized(gameStarted)
             {
@@ -53,7 +63,7 @@ public class CheckersServer
                                     Player player = new Player(clientIdCounter);
                                     ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
                                     Thread clientThread = new Thread(client);
-                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread, false);
+                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
 
                                     connectedClients.add(connectedClient);
                                     ++clientIdCounter;
@@ -81,7 +91,7 @@ public class CheckersServer
                     {
                         synchronized(connectedClients)
                         {
-                            LOGGER.info("trying to create game");
+                            LOGGER.info("trying to create game - players: " + connectedClients.size());
                             List<Player> players = new ArrayList<>();
                             for(ServerPlayer client : connectedClients)
                             {

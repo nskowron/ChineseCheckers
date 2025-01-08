@@ -10,12 +10,12 @@ public class ServerPlayer
     public Thread clientThread;
     public Boolean ready;
 
-    public ServerPlayer(int id, Player gamePlayer, ClientHandler playerClient, Thread clientThread, Boolean ready)
+    public ServerPlayer(int id, Player gamePlayer, ClientHandler playerClient, Thread clientThread)
     {
         this.id = id;
         this.gamePlayer = gamePlayer;
         this.playerClient = playerClient;
         this.clientThread = clientThread;
-        this.ready = ready;
+        this.ready = false;
     }
 }

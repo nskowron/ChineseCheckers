@@ -10,15 +10,16 @@ import java.util.ArrayList;
 
 public class Game implements Serializable
 {
-    private IValidityChecker checker;
+    private IMoveChecker checker;
     private IBoard board;
 
     List<Player> players;
     List<Player> winners;
 
     private int currentTurn;
+    private MoveData previousMove;
 
-    public Game(IValidityChecker checker, IBoard board, List<Player> gamePlayers) throws IllegalArgumentException
+    public Game(IMoveChecker checker, IBoard board, List<Player> gamePlayers) throws IllegalArgumentException
     {
         List<Player> players = new ArrayList<>();
         for(Player player : gamePlayers)
@@ -33,6 +34,7 @@ public class Game implements Serializable
         this.winners = new ArrayList<>();
 
         this.currentTurn = 0;
+        this.previousMove = null;
     }
 
     public GameState getState()
@@ -46,11 +48,19 @@ public class Game implements Serializable
 
     public Boolean move(Player player, Move move) throws IllegalAccessError
     {
-        if(player.getId() != players.get(currentTurn).getId())
+        if(player != players.get(currentTurn))
         {
             throw new IllegalAccessError("It's not the player's turn");
         }
-        if(!checker.validMove(move))
+
+        Piece piece = board.findNodeById(move.startId).getPiece();
+        if(piece != null && piece.getOwner() != player)
+        {
+            throw new IllegalAccessError("Can't move someone else's piece");
+        }
+
+        MoveData thisMove = checker.checkMove(move, previousMove);
+        if(!thisMove.valid)
         {
             throw new IllegalAccessError("Invalid move");
         }
@@ -58,54 +68,53 @@ public class Game implements Serializable
         {
             board.move(move);
         }
-        return false; // TODO: add winning mechanics
+        previousMove = thisMove;
+
+        if(thisMove.winning)
+        {
+            winners.add(player);
+        }
+
+        return thisMove.winning;
     }
 
-    //make recursive for jumps
     public List<int[]> getValidMoves(Player player, int[] beginId)
     {
-        List<int[]> endIds = new ArrayList<>();
-
-        // TODO: add checking for turn?
-
-        Node beginNode = board.findNodeById(beginId);
-        if(beginNode == null)
+        Piece piece = board.findNodeById(beginId).getPiece();
+        if(piece.getOwner() != player)
         {
-            return endIds;
+            System.out.println("Not my turn?");
+            return new ArrayList<>();
         }
 
-        for(int i = 0; i < 6; ++i)
+        if(players.get(currentTurn) != player)
         {
-            Node neighbor = beginNode.getNeighbors().get(i); // consider Node.getNeighbor(int)
-            while(neighbor != null)
-            {
-                if(checker.validMove(new Move(beginId, neighbor.id)))
-                {
-                    endIds.add(neighbor.id);
-                    break;
-                }
-                neighbor = neighbor.getNeighbors().get(i);
-            }
+            return checker.getValidMoves(beginId, null);
         }
-
-        return endIds;
+        else
+        {
+            return checker.getValidMoves(beginId, previousMove);
+        }
     }
 
     public void endTurn(Player player) throws IllegalAccessError
     {
-        if(player.getId() == players.get(currentTurn).getId())
+        if(player != players.get(currentTurn))
         {
-            for(int i = 1; i < players.size(); ++i)
-            {
-                currentTurn = (currentTurn + 1) % players.size();
-                if(players.get(currentTurn).didWin() == false)
-                {
-                    return;
-                }
-            }
-            throw new IllegalAccessError("There are no more players");
+            throw new IllegalAccessError("It's not the player's turn");
         }
-        throw new IllegalAccessError("It's not the player's turn");
+
+        for(int i = 1; i < players.size(); ++i)
+        {
+            currentTurn = (currentTurn + 1) % players.size();
+            if(winners.contains(player) == false)
+            {
+                previousMove = null;
+                return;
+            }
+        }
+        throw new IllegalAccessError("There are no more players");
+        
     }
 
     public IBoard getBoard()
