@@ -73,6 +73,7 @@ public class MoveChecker implements IMoveChecker
         return data;
     }
 
+    // add not getting out of the target nodes
     @Override
     public List<int[]> getValidMoves(int[] beginId, MoveData prev)
     {

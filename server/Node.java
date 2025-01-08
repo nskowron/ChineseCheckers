@@ -20,10 +20,6 @@ public class Node implements Serializable
         this.colorTarget = colorTarget;
 
         this.neighbors = new ArrayList<>();
-        for(int i = 0; i < 6; ++i)
-        {
-            neighbors.add(null);
-        }
     }
 
     public Node(int[] id)

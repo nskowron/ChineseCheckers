@@ -146,14 +146,13 @@ public class Board implements IBoard
 
         int y = node.id[0];
         int x = node.id[1];
-        List<Node> neighbors = List.of(
-            findNodeById(new int[]{y-1, x-1}),
-            findNodeById(new int[]{y-1, x+1}),
-            findNodeById(new int[]{y, x-2}),
-            findNodeById(new int[]{y, x+2}),
-            findNodeById(new int[]{y+1, x-1}),
-            findNodeById(new int[]{y+1, x+1})
-        );
+        List<Node> neighbors = new ArrayList<>();
+        neighbors.add(findNodeById(new int[]{y-1, x-1}));
+        neighbors.add(findNodeById(new int[]{y-1, x+1}));
+        neighbors.add(findNodeById(new int[]{y, x-2}));
+        neighbors.add(findNodeById(new int[]{y, x+2}));
+        neighbors.add(findNodeById(new int[]{y+1, x-1}));
+        neighbors.add(findNodeById(new int[]{y+1, x+1}));
 
         node.addNeighbors(neighbors);
 
