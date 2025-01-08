@@ -2,6 +2,7 @@ package server;
 
 import shared.Move;
 import shared.Player;
+import utils.IntMap;
 import utils.Pair;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class Board implements IBoard
 
     public Board(File jsonStarFile) throws IOException, StreamReadException, DatabindException
     {
-        this.nodes = new HashMap<>();
+        this.nodes = new IntMap<>();
 
         ObjectMapper jsonMapper = new ObjectMapper();
         Star star = jsonMapper.readValue(jsonStarFile, Star.class);
@@ -72,16 +73,7 @@ public class Board implements IBoard
     @Override
     public Node findNodeById(int[] id)
     {
-        for(Map.Entry<int[], Node> node : nodes.entrySet())
-        {
-            int[] key = node.getKey();
-            if(key[0] == id[0] && key[1] == id[1])
-            {
-                System.out.println("FOUND!");
-                return node.getValue();
-            }
-        }
-        return null;
+        return nodes.get(id);
     }
 
     @Override
