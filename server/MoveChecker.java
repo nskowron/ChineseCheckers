@@ -92,8 +92,37 @@ public class MoveChecker implements IMoveChecker
         return new ArrayList<>(endIds);
     }
 
-    private Set<int[]> getValidMovesRecursive(Node jumpNode, MoveData prev, int skipDirection)
+    private Set<int[]> getValidMovesRecursive(Node startNode, MoveData prev, int skipDirection)
     {
-        return Set.of();
+        Set<int[]> endIds = Set.of();
+
+        for(int i = 0; i < 6; ++i)
+        {
+            if(i == skipDirection)
+            {
+                continue;
+            }
+
+            Node inBetween = startNode.getNeighbors().get(i);
+            if(inBetween == null)
+            {
+                continue;
+            }
+
+            Node endNode = inBetween.getNeighbors().get(i);
+            if(endNode == null)
+            {
+                continue;
+            }
+
+            MoveData tryMove = checkMove(new Move(startNode.getID(), endNode.getID()), prev);
+            if(tryMove.valid)
+            {
+                endIds.add(endNode.getID());
+                endIds.addAll(getValidMovesRecursive(endNode, tryMove, i));
+            }
+        }
+
+        return endIds;
     }
 }

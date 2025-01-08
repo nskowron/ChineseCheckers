@@ -66,9 +66,7 @@ public class CheckersServer
                                     ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
 
                                     connectedClients.add(connectedClient);
-                                    setReady(false, clientIdCounter);
                                     ++clientIdCounter;
-
 
                                     clientThread.start();
                                 }

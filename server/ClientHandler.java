@@ -57,6 +57,7 @@ public class ClientHandler implements Runnable
 
         requestHandler = getDefaultRequestHandler();
         requestHandler.get("GREET").run(null);
+        requestHandler.get("READY").run(Boolean.FALSE);
 
         Thread readiness = new Thread(() -> {
             while(!gameStarted.met)
