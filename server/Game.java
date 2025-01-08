@@ -3,10 +3,13 @@ package server;
 import shared.GameState;
 import shared.Move;
 import shared.Player;
+import utils.IntMap;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Game implements Serializable
 {
@@ -17,7 +20,7 @@ public class Game implements Serializable
     List<Player> winners;
 
     private int currentTurn;
-    private MoveData previousMove;
+    private Map<int[], List<int[]> > validMoves;
 
     public Game(IMoveChecker checker, IBoard board, List<Player> gamePlayers) throws IllegalArgumentException
     {
@@ -34,7 +37,7 @@ public class Game implements Serializable
         this.winners = new ArrayList<>();
 
         this.currentTurn = 0;
-        this.previousMove = null;
+        this.validMoves = new IntMap<>();
     }
 
     public GameState getState()
@@ -59,42 +62,43 @@ public class Game implements Serializable
             throw new IllegalAccessError("Can't move someone else's piece");
         }
 
-        MoveData thisMove = checker.checkMove(move, previousMove);
-        if(!thisMove.valid)
+        if(getValidMoves(player, move.startId).contains(move.endId))
         {
-            throw new IllegalAccessError("Invalid move");
+            board.move(move);
+            return checker.winningMove(move);
         }
         else
         {
-            board.move(move);
+            throw new IllegalAccessError("Invalid move");
         }
-        previousMove = thisMove;
-
-        if(thisMove.winning)
-        {
-            winners.add(player);
-        }
-
-        return thisMove.winning;
     }
 
     public List<int[]> getValidMoves(Player player, int[] beginId)
     {
+        if(validMoves.get(beginId) != null)
+        {
+            return validMoves.get(beginId);
+        }
+
+        List<int[]> validEndIds;
+    
         Piece piece = board.findNodeById(beginId).getPiece();
         if(piece.getOwner() != player)
         {
-            System.out.println("Not my turn?");
-            return new ArrayList<>();
+            System.out.println("Not the player's piece");
+            validEndIds = new ArrayList<>();
         }
-
-        if(players.get(currentTurn) != player)
+        else if(players.get(currentTurn) != player)
         {
-            return checker.getValidMoves(beginId, null);
+            validEndIds = checker.getValidMoves(beginId);
         }
         else
         {
-            return checker.getValidMoves(beginId, previousMove);
+            validEndIds = checker.getValidMoves(beginId);
         }
+
+        validMoves.put(beginId, validEndIds);
+        return validEndIds;
     }
 
     public void endTurn(Player player) throws IllegalAccessError
@@ -109,7 +113,7 @@ public class Game implements Serializable
             currentTurn = (currentTurn + 1) % players.size();
             if(winners.contains(player) == false)
             {
-                previousMove = null;
+                validMoves = new IntMap<>();
                 return;
             }
         }

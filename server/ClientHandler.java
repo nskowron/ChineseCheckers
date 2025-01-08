@@ -211,8 +211,8 @@ public class ClientHandler implements Runnable
         requestHandler.put("GAME_START", (Object start) -> {
             synchronized(CheckersServer.class)
             {
-                Game game = CheckersServer.getGame();
-                send(new Request("GAME_START", game.getState()));
+                send(new Request("GAME_START", player));
+                requestHandler.get("UPDATE").run(null);
             }
         });
 

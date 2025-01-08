@@ -2,6 +2,7 @@ package server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import shared.Move;
@@ -15,18 +16,12 @@ public class MoveChecker implements IMoveChecker
         this.board = board;
     }
 
-    @Override
-    public boolean validMove(Move move, MoveData prev)
+    public boolean validMove(Move move)
     {
         Node startNode = board.findNodeById(move.startId);
         Node endNode = board.findNodeById(move.endId);
 
         if(startNode.getPiece() == null || endNode.getPiece() != null)
-        {
-            return false;
-        }
-
-        if(prev != null && !prev.jump)
         {
             return false;
         }
@@ -45,7 +40,6 @@ public class MoveChecker implements IMoveChecker
         return false;
     }
 
-    @Override
     public boolean jumpMove(Move move)
     {
         List<Node> neigbors1 = board.findNodeById(move.startId).getNeighbors();
@@ -63,19 +57,9 @@ public class MoveChecker implements IMoveChecker
         return commonNeighbors.size() == 1 && commonNeighbors.get(0).getPiece() != null;
     }
 
-    @Override
-    public MoveData checkMove(Move move, MoveData prev)
-    {
-        MoveData data = new MoveData();
-        data.valid = validMove(move, prev);
-        data.jump = jumpMove(move);
-        data.winning = winningMove(move);
-        return data;
-    }
-
     // add not getting out of the target nodes
     @Override
-    public List<int[]> getValidMoves(int[] beginId, MoveData prev)
+    public List<int[]> getValidMoves(int[] beginId)
     {
         List<int[]> endIds = new ArrayList<>();
 
@@ -89,18 +73,18 @@ public class MoveChecker implements IMoveChecker
             }
             System.out.println(neighbor.getID()[0] + ", " + neighbor.getID()[0]);
 
-            if(validMove(new Move(beginId, neighbor.getID()), prev))
+            if(validMove(new Move(beginId, neighbor.getID())))
             {
                 endIds.add(neighbor.getID());
             }
         }
 
-        endIds.addAll(getValidMovesRecursive(beginNode, prev, -1));
+        endIds.addAll(getValidMovesRecursive(beginNode, -1));
 
-        return new ArrayList<>(endIds);
+        return endIds;
     }
 
-    private List<int[]> getValidMovesRecursive(Node startNode, MoveData prev, int skipDirection)
+    private List<int[]> getValidMovesRecursive(Node startNode, int skipDirection)
     {
         List<int[]> endIds = new ArrayList<>();
 
@@ -123,11 +107,10 @@ public class MoveChecker implements IMoveChecker
                 continue;
             }
 
-            MoveData tryMove = checkMove(new Move(startNode.getID(), endNode.getID()), prev);
-            if(tryMove.valid)
+            if(validMove(new Move(startNode.getID(), endNode.getID())))
             {
                 endIds.add(endNode.getID());
-                endIds.addAll(getValidMovesRecursive(endNode, tryMove, i));
+                endIds.addAll(getValidMovesRecursive(endNode, i));
             }
         }
 
