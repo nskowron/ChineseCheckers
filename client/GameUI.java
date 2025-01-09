@@ -138,7 +138,9 @@ public class GameUI
         systemOutputArea.setEditable(false);
         systemOutputArea.setStyle("-fx-font-family: Consolas; " +
                                 "-fx-font-size: 14px; " +
-                                "-fx-text-fill: black;");
+                                "-fx-text-fill: white;" +
+                                "-fx-border-color: rgb(30, 30, 30);"+
+                                "-fx-control-inner-background: rgb(50, 50, 50);");
         systemOutputArea.setPrefHeight(830);
 
         rightVbox.getChildren().add(systemOutputArea);
@@ -148,6 +150,8 @@ public class GameUI
         moveButton = new Button("MOVE");
         endTurnButton.setPrefSize(150, 80);
         moveButton.setPrefSize(150, 80);
+        endTurnButton.setStyle("-fx-border-width: 5px; -fx-border-radius: 10px;-fx-background-radius: 15px;  -fx-border-color: rgb(30, 30, 30); -fx-background-color: rgb(40, 40, 40); -fx-text-fill: white;");
+        moveButton.setStyle("-fx-border-width: 5px; -fx-border-radius: 10px;-fx-background-radius: 15px;  -fx-border-color: rgb(30, 30, 30); -fx-background-color: rgb(40, 40, 40); -fx-text-fill: white;");
 
         GridPane grid = new GridPane();
         grid.add(moveButton, 1, 0);
@@ -165,9 +169,8 @@ public class GameUI
 
         HBox hbox = new HBox();
         hbox.setSpacing(20);
-        hbox.setPadding(new Insets(0, 0, 0, 20));
+        hbox.setPadding(new Insets(0, 20, 10, 20));
         hbox.setStyle("-fx-background-color: rgb(50, 50, 50);");
-
         hbox.getChildren().addAll(boardAndPlayer, rightVbox);
 
         root = new ScrollPane(hbox);

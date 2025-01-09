@@ -13,3 +13,6 @@ runS:
 
 runC:
 	java --module-path ./javaFX/lib --add-modules javafx.controls -cp bin client.CheckersClientApp
+
+runCR:
+	java --module-path ./javaFX/lib --add-modules javafx.controls -cp bin client.CheckersClientApp resize

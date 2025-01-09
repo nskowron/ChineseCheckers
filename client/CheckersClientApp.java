@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.transform.Scale;
 
@@ -31,12 +32,18 @@ public class CheckersClientApp extends Application
 
         // Main Stage
         this.primaryStage = primaryStage;
-        VBox vbox = new VBox(gameUI.getRoot());
-        vbox.setStyle("-fx-background-color: rgb(50, 50, 50);");
-        Scene scene = new Scene(vbox, 1250, 980);
+        Scene scene = new Scene(gameUI.getRoot(), 1257, 975); //Oddly specific...
         this.primaryStage.setTitle("Chinese Checkers Client");
         this.primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
+
+        if (getParameters().getRaw().contains("resize")) 
+        {
+            // Make the stage resizable if the argument "resize" is passed
+            primaryStage.setResizable(true);
+        } else {
+            // Set the stage to non-resizable by default
+            primaryStage.setResizable(false);
+        }
 
         // Continue with setting up Controllers
         gameController.setRooms(welcomeStage, primaryStage);
