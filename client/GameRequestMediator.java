@@ -81,7 +81,6 @@ public class GameRequestMediator implements Runnable
 
                     Player player = (Player) request.getData();
                     gameEndPoint.setPlayer(player);
-                    System.out.print(player.getColor());
                     Platform.runLater(() -> 
                     {
                         gameEndPoint.getGameUI().setPlayerLabelText("You are " + " (" + player.getId() + ")");
@@ -92,7 +91,6 @@ public class GameRequestMediator implements Runnable
 
                     gameEndPoint.lock(); //LOCK FIRST, WAIT FOR UPDATE
                     String playerColor = (String) request.getData();
-                    System.out.print(playerColor);
                     Platform.runLater(() -> 
                     {
                         gameEndPoint.getGameUI().setPlayerLabelText("You are " + playerColor);

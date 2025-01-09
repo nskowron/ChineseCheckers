@@ -1,7 +1,5 @@
 package client;
 
-import utils.Pair;
-
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 

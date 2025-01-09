@@ -37,7 +37,9 @@ public class CheckersClientApp extends Application
         gameController.setRooms(welcomeStage, primaryStage);
         gameController.setup();
         requestMediator.addGameController(gameController);
-        new Thread(requestMediator).start();
+        Thread requestThread = new Thread(requestMediator);
+        gameController.setRequesterThread(requestThread);
+        requestThread.start();
 
         // Start the app
         welcomeStage.show();

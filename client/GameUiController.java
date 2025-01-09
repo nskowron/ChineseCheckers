@@ -18,6 +18,9 @@ public class GameUiController
     private final WelcomeUI welcomeUI;
     private final GameRequestMediator requestReceiver;
 
+    // for closing purposes
+    private Thread receiverThread;
+
     // Move Helpers
     private GraphicNode firstSelectedNode = null;
     private GraphicNode secondSelectedNode = null;
@@ -73,7 +76,16 @@ public class GameUiController
         {
             if (response == ButtonType.FINISH) 
             {
+                try
+                {
+                    receiverThread.interrupt();
+                }
+                catch ( Exception e)
+                {
+                    e.printStackTrace();     
+                }
                 Platform.exit(); 
+                System.exit(0);
             }
         });
     }
@@ -88,7 +100,16 @@ public class GameUiController
         {
             if (response == ButtonType.FINISH) 
             {
+                try
+                {
+                    receiverThread.interrupt();
+                }
+                catch ( Exception e)
+                {
+                    e.printStackTrace();     
+                }
                 Platform.exit(); 
+                System.exit(0);      
             }
         });
     }
@@ -174,6 +195,10 @@ public class GameUiController
                         gameUI.appendToSystemOutput(e.getMessage());
                         unlock();
                     }
+
+                    gameUI.clearAllHighlights();
+                    firstSelectedNode = null;
+                    secondSelectedNode = null;
                 }
             }
             else
@@ -242,5 +267,10 @@ public class GameUiController
     public Player getPlayer()
     {
         return this.player;
+    }
+
+    public void setRequesterThread(Thread thread)
+    {
+        this.receiverThread = thread;
     }
 }
