@@ -5,7 +5,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 public class GameUI 
 {
-    private final VBox root;
+    private ScrollPane root;
     private final BoardGridPane boardGridPane;
     private Set<GraphicNode> nodeSet;
 
@@ -31,14 +30,12 @@ public class GameUI
 
     public GameUI() 
     {
-        this.root = new VBox();
-        root.setStyle("-fx-background-color: rgb(50, 50, 50);");
-
+        root = new ScrollPane();
         this.boardGridPane = new BoardGridPane();
         this.nodeSet = new HashSet<>();
     }
 
-    public VBox getRoot() 
+    public ScrollPane getRoot() 
     {
         return root;
     }
@@ -173,10 +170,8 @@ public class GameUI
 
         hbox.getChildren().addAll(boardAndPlayer, rightVbox);
 
-        ScrollPane scrollPane = new ScrollPane(hbox);
-        scrollPane.setStyle("-fx-background-color: rgb(50, 50, 50);");
-
-        root.getChildren().add(scrollPane);
+        root = new ScrollPane(hbox);
+        root.setStyle("-fx-background-color: rgb(50, 50, 50);");
     }
 }
 
