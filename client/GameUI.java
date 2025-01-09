@@ -3,6 +3,7 @@ package client;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -172,11 +173,10 @@ public class GameUI
 
         hbox.getChildren().addAll(boardAndPlayer, rightVbox);
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(hbox);
-        borderPane.setStyle("-fx-background-color: rgb(50, 50, 50);");
+        ScrollPane scrollPane = new ScrollPane(hbox);
+        scrollPane.setStyle("-fx-background-color: rgb(50, 50, 50);");
 
-        root.getChildren().add(borderPane);
+        root.getChildren().add(scrollPane);
     }
 }
 
