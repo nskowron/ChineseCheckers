@@ -35,7 +35,7 @@ public class MoveChecker implements IMoveChecker
             return false;
         }
 
-        if(startNode.getColorTarget().equals(player.getColor()) && !startNode.getColorTarget().equals(player.getColor()))
+        if(startNode.getColorTarget().equals(player.getColor()) && !endNode.getColorTarget().equals(player.getColor()))
         {
             return false;
         }
