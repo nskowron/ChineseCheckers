@@ -1,8 +1,10 @@
 package client;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.transform.Scale;
 
 
 public class CheckersClientApp extends Application 
@@ -28,10 +30,14 @@ public class CheckersClientApp extends Application
 
         // Main Stage
         this.primaryStage = primaryStage;
+        Scale scale = new Scale(1, 1, 0 ,0);
+        scale.xProperty().bind(Bindings.divide(primaryStage.widthProperty(), 1250));
+        scale.yProperty().bind(Bindings.divide(primaryStage.heightProperty(), 980));
+        gameUI.getRoot().getTransforms().add(scale);
         Scene scene = new Scene(gameUI.getRoot(), 1250, 980);
         this.primaryStage.setTitle("Chinese Checkers Client");
         this.primaryStage.setScene(scene);
-        this.primaryStage.setResizable(false);
+        //primaryStage.setResizable(false);
 
         // Continue with setting up Controllers
         gameController.setRooms(welcomeStage, primaryStage);
