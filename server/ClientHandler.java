@@ -258,6 +258,7 @@ public class ClientHandler implements Runnable
                         Boolean won = game.move(player, (Move)move);
                         requestHandler.get("END_TURN").run(null);
 
+                        LOGGER.info("won? " + won);
                         if(won)
                         {
                             send(new Request("WON", player)); // or broadcast?

@@ -64,9 +64,10 @@ public class Game implements Serializable
         List<int[]> validEndIds = getValidMoves(player, move.startId);
         if(validEndIds.contains(move.endId))
         {
+            Boolean winning = checker.winningMove(piece, move);
             board.move(move);
             validMoves = new IntMap<>();
-            return checker.winningMove(piece, move);
+            return winning;
         }
         else
         {
@@ -112,6 +113,7 @@ public class Game implements Serializable
             currentTurn = (currentTurn + 1) % players.size();
             if(winners.contains(player) == false)
             {
+                validMoves = new IntMap<>();
                 return;
             }
         }

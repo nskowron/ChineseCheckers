@@ -117,12 +117,14 @@ public class Board implements IBoard
 
         for(Node node : nodes.values())
         {
-            String color = node.getColorStarting();
+            String color = node.getColorTarget();//
             if(playerColors.containsKey(color))
             {
                 node.place(new Piece(color, playerColors.get(color)));
             }
         }
+
+        nodes.get(new int[]{5, 11}).place(nodes.get(new int[]{4, 12}).take());//
     }
 
     private void linkRecursive(Node node)
