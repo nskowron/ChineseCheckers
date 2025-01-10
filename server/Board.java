@@ -117,7 +117,7 @@ public class Board implements IBoard
 
         for(Node node : nodes.values())
         {
-            String color = node.getColorTarget();//
+            String color = node.getColorTarget();///
             if(playerColors.containsKey(color))
             {
                 node.place(new Piece(color, playerColors.get(color)));
