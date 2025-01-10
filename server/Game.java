@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Game implements Serializable
 {
@@ -63,16 +62,16 @@ public class Game implements Serializable
         }
 
         List<int[]> validEndIds = getValidMoves(player, move.startId);
-        for(int[] id : validEndIds)
+        if(validEndIds.contains(move.endId))
         {
-            if(Arrays.equals(id, move.endId))
-            {
-                board.move(move);
-                return checker.winningMove(move);
-            }
+            board.move(move);
+            validMoves = new IntMap<>();
+            return checker.winningMove(piece, move);
         }
-        
-        throw new IllegalAccessError("Invalid move");
+        else
+        {
+            throw new IllegalAccessError("Invalid move");
+        }
     }
 
     public List<int[]> getValidMoves(Player player, int[] beginId)
@@ -83,15 +82,18 @@ public class Game implements Serializable
         }
 
         List<int[]> validEndIds;
-    
-        Piece piece = board.findNodeById(beginId).getPiece();
+        
+        Node startNode = board.findNodeById(beginId);
+        Piece piece = startNode.getPiece();
         if(piece == null || piece.getOwner() != player)
         {
             validEndIds = new ArrayList<>();
         }
         else
         {
-            validEndIds = checker.getValidMoves(player, beginId);
+            startNode.take();
+            validEndIds = checker.getValidMoves(piece, beginId);
+            startNode.place(piece);
         }
 
         validMoves.put(beginId, validEndIds);
@@ -110,7 +112,6 @@ public class Game implements Serializable
             currentTurn = (currentTurn + 1) % players.size();
             if(winners.contains(player) == false)
             {
-                validMoves = new IntMap<>();
                 return;
             }
         }

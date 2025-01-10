@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import shared.Move;
-import shared.Player;
+import utils.IntList;
 
 public class MoveChecker implements IMoveChecker
 {
@@ -19,23 +19,17 @@ public class MoveChecker implements IMoveChecker
         this.visitedNodes = null;
     }
 
-    private boolean validMove(Player player, Move move)
+    public boolean validMove(Piece piece, Move move)
     {
         Node startNode = board.findNodeById(move.startId);
         Node endNode = board.findNodeById(move.endId);
 
-        Piece piece = startNode.getPiece();
-        if(piece != null && !piece.getColor().equals(player.getColor()))
+        if(piece == null || startNode.getPiece() != null || endNode.getPiece() != null)
         {
             return false;
         }
 
-        if(endNode.getPiece() != null)
-        {
-            return false;
-        }
-
-        if(startNode.getColorTarget().equals(player.getColor()) && !endNode.getColorTarget().equals(player.getColor()))
+        if(startNode.getColorTarget().equals(piece.getColor()) && !endNode.getColorTarget().equals(piece.getColor()))
         {
             return false;
         }
@@ -49,29 +43,32 @@ public class MoveChecker implements IMoveChecker
     }
 
     @Override
-    public boolean winningMove(Move move)
+    public boolean winningMove(Piece piece, Move move)
     {
-        Piece piece = board.findNodeById(move.startId).getPiece();
+        String color = piece.getColor();
         Node startNode = board.findNodeById(move.startId);
         Node endNode = board.findNodeById(move.endId);
 
-        if(piece == null || endNode.getColorTarget() != piece.getColor())
+        if(piece == null || endNode.getPiece() != null)
+        {
+            return false;
+        }
+
+        if(startNode.getColorTarget().equals(color) || !endNode.getColorTarget().equals(color))
         {
             return false;
         }
 
         for(Node node : board.getNodes().values())
         {
-            if(node.getColorTarget().equals(piece.getColor()))
+            if(node.getColorTarget().equals(color))
             {
                 if(node == endNode)
                 {
-                    if(startNode.getColorTarget().equals(piece.getColor()))
-                    {
-                        return false;
-                    }
+                    continue;
                 }
-                if(node.getPiece() == null || !node.getPiece().getColor().equals(piece.getColor()))
+
+                if(node.getPiece() == null || !node.getPiece().getColor().equals(color))
                 {
                     return false;
                 }
@@ -99,9 +96,9 @@ public class MoveChecker implements IMoveChecker
     }
 
     @Override
-    public List<int[]> getValidMoves(Player player, int[] beginId)
+    public List<int[]> getValidMoves(Piece piece, int[] beginId)
     {
-        List<int[]> endIds = new ArrayList<>();
+        List<int[]> endIds = new IntList();
 
         Node beginNode = board.findNodeById(beginId);
         for(Node neighbor : beginNode.getNeighbors())
@@ -111,19 +108,19 @@ public class MoveChecker implements IMoveChecker
                 continue;
             }
 
-            if(validMove(player, new Move(beginId, neighbor.getID())))
+            if(validMove(piece, new Move(beginId, neighbor.getID())))
             {
                 endIds.add(neighbor.getID());
             }
         }
 
         visitedNodes = new ArrayList<>();
-        endIds.addAll(getValidMovesRecursive(player, beginNode));
+        endIds.addAll(getValidMovesRecursive(piece, beginNode));
 
         return endIds;
     }
 
-    private List<int[]> getValidMovesRecursive(Player player, Node startNode)
+    private List<int[]> getValidMovesRecursive(Piece piece, Node startNode)
     {
         List<int[]> endIds = new ArrayList<>();
 
@@ -148,10 +145,10 @@ public class MoveChecker implements IMoveChecker
                 continue;
             }
 
-            if(validMove(player, new Move(startNode.getID(), endNode.getID())))
+            if(validMove(piece, new Move(startNode.getID(), endNode.getID())))
             {
                 endIds.add(endNode.getID());
-                endIds.addAll(getValidMovesRecursive(player, endNode));
+                endIds.addAll(getValidMovesRecursive(piece, endNode));
             }
         }
 
