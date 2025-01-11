@@ -9,7 +9,7 @@ clean:
 	rm -rf ./bin/utils/*.class
 
 runS:
-	java --module-path ./Jackson --add-modules com.fasterxml.jackson.databind -cp bin server.CheckersServer
+	java --module-path ./Jackson --add-modules com.fasterxml.jackson.databind -cp bin server.CheckersServer $(ARGS)
 
 runC:
 	java --module-path ./javaFX/lib --add-modules javafx.controls -cp bin client.CheckersClientApp

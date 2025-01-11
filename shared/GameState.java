@@ -2,8 +2,8 @@ package shared;
 
 import java.util.Map;
 
-import server.Node;
-import server.Piece;
+import server.game.Node;
+import server.game.Piece;
 
 import java.io.Serializable;
 import java.util.HashMap;

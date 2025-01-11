@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import server.game.Game;
+
 public class ClientHandler implements Runnable 
 {
     private final int id;
