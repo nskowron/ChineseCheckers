@@ -1,8 +1,9 @@
-package server;
+package server.game.test;
 
 import shared.Move;
 import shared.Player;
 import utils.IntMap;
+import server.game.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,13 +16,13 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Board implements IBoard
+public class TESTBoard implements IBoard
 {
     private Map<int[], Node> nodes;
 
     private List<String> starColors;
 
-    public Board(File jsonStarFile) throws IOException, StreamReadException, DatabindException
+    public TESTBoard(File jsonStarFile) throws IOException, StreamReadException, DatabindException
     {
         this.nodes = new IntMap<>();
 
@@ -167,3 +168,4 @@ public class Board implements IBoard
         }
     }
 }
+

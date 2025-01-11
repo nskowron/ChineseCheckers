@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import server.game.Game;
+import server.game.GameAssetsBuilder;
+import server.game.IBoard;
+import server.game.IMoveChecker;
+import server.game.GameAssetsFactory;
 import shared.Player;
 import shared.Request;
 
@@ -29,10 +34,20 @@ public class CheckersServer
         IBoard board;
         IMoveChecker validator;
         try
-        {    // Will depend on the argument
-            File jsonStarFile = new File("data/star.json");
-            board = new Board(jsonStarFile);
-            validator = new MoveChecker(board);
+        {
+            GameAssetsBuilder builder;
+            if(args.length == 0)
+            {
+                builder = GameAssetsFactory.get("BASIC");
+            }
+            else
+            {
+                LOGGER.info("Custom game: " + args[0]);
+                builder = GameAssetsFactory.get(args[0]);
+            }
+
+            board = builder.getBoard();
+            validator = builder.getMoveChecker();
         }
         catch(IOException e)
         {

@@ -1,8 +1,9 @@
-package server;
+package server.game.basic;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import server.game.*;
 import shared.Move;
 import utils.IntList;
 

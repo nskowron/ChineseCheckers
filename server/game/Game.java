@@ -1,4 +1,4 @@
-package server;
+package server.game;
 
 import shared.GameState;
 import shared.Move;
