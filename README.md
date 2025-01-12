@@ -7,9 +7,9 @@
 ## Build and run project
 - `make`
 - `make runS` - to run server
-    - `make runS BASIC` - to run BASIC variant
-    - `make runS OOC`  - to run Order Out of Chaos variant
-    - `make runS TEST` - to run special test variant
+    - `make runS` - to run BASIC variant
+    - `make runS ARGS="OOC"`  - to run Order Out of Chaos variant
+    - `make runS ARGS="TEST"` - to run special test variant
 - `make runC` - to run client
     - `make runCR` - to run resizable client (compatibility)
 
