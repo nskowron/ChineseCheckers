@@ -161,7 +161,7 @@ public class BoardGridPane extends GridPane
         starPositions.put(new int[]{17, 13}, Color.MAGENTA);
     }
 
-    public void putGraphicNode(int row, int col, double radius, GameUI UI) 
+    public void putGraphicNode(int row, int col, double radius, BoardUI UI) 
     {
         int[] positionKey = {row, col};
 
@@ -185,7 +185,7 @@ public class BoardGridPane extends GridPane
         UI.addNode(node);
     }
 
-    public void createBoard(double radius, GameUI UI) 
+    public void createBoard(double radius, BoardUI UI) 
     {
         int rows = 20;
         int cols = 28;
