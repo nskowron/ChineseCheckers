@@ -135,9 +135,9 @@ public class ClientHandler implements Runnable
         CheckersServer.removeClient(id);
         try
         {
-            clientSocket.close();
             in.close();
             out.close();
+            clientSocket.close();
         }
         catch( IOException e )
         {

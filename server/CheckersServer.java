@@ -6,8 +6,10 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
+import server.bots.RandomBot;
 import server.game.Game;
 import server.game.GameAssetsBuilder;
 import server.game.IBoard;
@@ -59,6 +61,35 @@ public class CheckersServer
         {
             LOGGER.info("Server is running on port " + PORT + "...");
 
+            // Consider putting commands and acceptance into their own classes
+            Thread commands = new Thread(() -> {
+                Scanner scanner = new Scanner(System.in);
+                while(true)
+                {
+                    String command = scanner.nextLine();
+
+                    // probably could add checking for args which bot
+                    // and make factory command -> runnable, instead of ifs
+                    if(command.equals("ADD_BOT"))
+                    {
+                        try
+                        {
+                            new RandomBot();
+                        }
+                        catch(IOException e)
+                        {
+                            LOGGER.severe("Bot creation failed");
+                        }
+                    }
+                    else if(command.equals("OFF"))
+                    {
+                        break;
+                    }
+                }
+                scanner.close();
+            });
+            commands.start();
+
             synchronized(gameStarted)
             {
                 Thread acceptance = new Thread(() -> {
@@ -69,6 +100,11 @@ public class CheckersServer
                             try
                             {
                                 Socket clientSocket = serverSocket.accept();
+                                if(Thread.interrupted())
+                                {
+                                    break;
+                                }
+
                                 LOGGER.info("New socket accepted");
 
                                 synchronized(connectedClients)
@@ -117,10 +153,12 @@ public class CheckersServer
 
                             // Succeeded at creating game
                             acceptance.interrupt();
+                            Socket dummySocket = new Socket("localhost", PORT); // for breaking acceptance thread
+                            dummySocket.close();
                             break;
                         }
                     }
-                    catch(IllegalArgumentException e) // Wrong no. of players
+                    catch(IllegalArgumentException | IOException e) // Wrong no. of players
                     {
                         try{ Thread.sleep(1000); }catch( InterruptedException f ){}
                     }
@@ -129,9 +167,7 @@ public class CheckersServer
                 gameStarted.met = true;
                 LOGGER.info("Game has started");
             }
-            // ClientThreads wake up
-            // Wait for them?
-            // yup
+            
             for(ServerPlayer client : connectedClients)
             {
                 try

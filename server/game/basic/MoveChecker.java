@@ -116,6 +116,7 @@ public class MoveChecker implements IMoveChecker
         }
 
         visitedNodes = new ArrayList<>();
+        visitedNodes.add(beginNode);
         endIds.addAll(getValidMovesRecursive(piece, beginNode));
 
         return endIds;
@@ -124,11 +125,6 @@ public class MoveChecker implements IMoveChecker
     private List<int[]> getValidMovesRecursive(Piece piece, Node startNode)
     {
         List<int[]> endIds = new ArrayList<>();
-
-        if(visitedNodes.contains(startNode))
-        {
-            return endIds;
-        }
         
         visitedNodes.add(startNode);
 
@@ -148,8 +144,11 @@ public class MoveChecker implements IMoveChecker
 
             if(validMove(piece, new Move(startNode.getID(), endNode.getID())))
             {
-                endIds.add(endNode.getID());
-                endIds.addAll(getValidMovesRecursive(piece, endNode));
+                if(!visitedNodes.contains(endNode))
+                {
+                    endIds.add(endNode.getID());
+                    endIds.addAll(getValidMovesRecursive(piece, endNode));
+                }
             }
         }
 
