@@ -53,6 +53,7 @@ public class RecordReader implements Runnable
         catch (IOException | InterruptedException e) 
         {
             e.printStackTrace();
+            stop();
             if (gameEndPoint != null) 
             {
                 Platform.runLater(() -> 
