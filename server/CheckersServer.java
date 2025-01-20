@@ -98,39 +98,32 @@ public class CheckersServer
                 Thread acceptance = new Thread(() -> {
                     while(!gameStarted.met)
                     {
-                        if(connectedClients.size() < 6)
+                        try
                         {
-                            try
+                            Socket clientSocket = serverSocket.accept();
+                            if(Thread.interrupted())
                             {
-                                Socket clientSocket = serverSocket.accept();
-                                if(Thread.interrupted())
-                                {
-                                    break;
-                                }
-
-                                LOGGER.info("New socket accepted");
-
-                                synchronized(connectedClients)
-                                {
-                                    everyoneReady = false;
-
-                                    Player player = new Player(clientIdCounter);
-                                    ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
-                                    Thread clientThread = new Thread(client);
-                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
-
-                                    connectedClients.add(connectedClient);
-                                    ++clientIdCounter;
-
-                                    clientThread.start();
-                                }
+                                break;
                             }
-                            catch(IOException e){ LOGGER.severe(e.getMessage()); try{ Thread.sleep(1000); }catch( InterruptedException f ){}}
+
+                            LOGGER.info("New socket accepted");
+
+                            synchronized(connectedClients)
+                            {
+                                everyoneReady = false;
+
+                                Player player = new Player(clientIdCounter);
+                                ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
+                                Thread clientThread = new Thread(client);
+                                ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
+
+                                connectedClients.add(connectedClient);
+                                ++clientIdCounter;
+
+                                clientThread.start();
+                            }
                         }
-                        else
-                        {
-                            try{ Thread.sleep(1000); }catch( InterruptedException e ){}
-                        }
+                        catch(IOException e){ LOGGER.severe(e.getMessage()); try{ Thread.sleep(1000); }catch( InterruptedException f ){ break; }}
                     }
                 });
                 acceptance.start();
@@ -227,11 +220,21 @@ public class CheckersServer
         {
             for(int i = 0; i < connectedClients.size(); ++i)
             {
-                if(gameStarted.met && connectedClients.get(i).id != id)
+                ServerPlayer client = connectedClients.get(i);
+                if(gameStarted.met)
                 {
-                    connectedClients.get(i).playerClient.send(new Request("ERROR", new Error("Client " + id + " disconnected")));
+                    connectedClients.remove(i--);
+                    if(client.id != id)
+                    {
+                        client.playerClient.send(new Request("ERROR", new Error("Client " + id + " disconnected")));
+                    }
                 }
-                connectedClients.remove(i);
+                else if(client.id == id)
+                {
+                    connectedClients.remove(i);
+                    setReady(null, id);
+                    return;
+                }
             }
         }
     }

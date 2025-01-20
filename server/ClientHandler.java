@@ -62,7 +62,7 @@ public class ClientHandler implements Runnable
         requestHandler.get("READY").run(Boolean.FALSE);
 
         Thread readiness = new Thread(() -> {
-            while(!gameStarted.met)
+            while(!gameStarted.met && running)
             {
                 Request request = receive();
                 if(request == null)
@@ -129,6 +129,11 @@ public class ClientHandler implements Runnable
 
     public void disconnect(boolean ok)
     {
+        if(!running)
+        {
+            return;
+        }
+
         running = false;
 
         if(ok)
@@ -143,8 +148,11 @@ public class ClientHandler implements Runnable
         CheckersServer.removeClient(id);
         try
         {
-            in.close();
-            out.close();
+            if(in != null && out != null)
+            {
+                in.close();
+                out.close();
+            }
             clientSocket.close();
         }
         catch( IOException e )

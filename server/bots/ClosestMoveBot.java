@@ -59,6 +59,10 @@ public class ClosestMoveBot implements Runnable
         while(running)
         {
             Request request = receive();
+            if(request == null)
+            {
+                continue;
+            }
             RequestRunnable action = requestHandler.get(request.getType());
             if(action != null)
             {
@@ -88,8 +92,11 @@ public class ClosestMoveBot implements Runnable
         
         try
         {
-            in.close();
-            out.close();
+            if(in != null && out != null)
+            {
+                in.close();
+                out.close();
+            }
             socket.close();
         }
         catch( IOException e )
