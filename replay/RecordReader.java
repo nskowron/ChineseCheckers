@@ -2,7 +2,6 @@ package replay;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import shared.ColorTranslator;
-import shared.GameState;
 import client.*;
 import memento.*;
 
@@ -13,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.List;
 
 public class RecordReader implements Runnable 
 {
@@ -44,7 +44,7 @@ public class RecordReader implements Runnable
 
                 Platform.runLater(() -> 
                 {
-                    handleUpdate(savedMove.state);
+                    handleUpdate(savedMove);
                 });
 
                 Thread.sleep(2000);
@@ -64,16 +64,16 @@ public class RecordReader implements Runnable
         }
     }
 
-    private void handleUpdate(GameState state) 
+    private void handleUpdate(SavedMove savedMove) 
     {
         if (gameEndPoint == null) 
         {
             throw new IllegalStateException("Game controller is not attached");
         }
 
-        for (Map.Entry<int[], String> entry : state.board.entrySet()) 
+        for (Map.Entry<List<Integer>, String> entry : savedMove.board.entrySet()) 
         {
-            int[] key = entry.getKey();
+            int[] key = {entry.getKey().get(0), entry.getKey().get(1)};
             Color color = ColorTranslator.get(entry.getValue());
             GraphicNode node = gameEndPoint.findNodeById(key);
             if (node != null) 
@@ -82,16 +82,16 @@ public class RecordReader implements Runnable
             }
         }
 
-        if (state.won != null) 
-        {
-            gameEndPoint.appendToSystemOutput(state.won.getColor() + " just won!");
-        }
-
-        gameEndPoint.setCurrentLabelText(state.currentTurn.getColor());
+        gameEndPoint.setCurrentLabelText(savedMove.playerColor);
     }
 
     public void stop() 
     {
         running = false;
+    }
+
+    public void start()
+    {
+        running = true;
     }
 }
