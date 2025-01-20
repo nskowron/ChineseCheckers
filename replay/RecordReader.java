@@ -1,6 +1,8 @@
 package replay;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import shared.ColorTranslator;
 import client.*;
 import memento.*;
@@ -9,8 +11,6 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,6 +22,7 @@ public class RecordReader implements Runnable
     private final String filePath;
     private boolean running = true;
     private GameUI gameEndPoint;
+    private Runnable alert;
 
     public RecordReader(String filePath) 
     {
@@ -33,10 +34,18 @@ public class RecordReader implements Runnable
         this.gameEndPoint = controller;
     }
 
+    public void addAlert(Runnable alert)
+    {
+        this.alert = alert;
+    }
+
     @Override
     public void run() 
     {
         ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addKeyDeserializer(List.class, new ListKeyDeserializer());
+        objectMapper.registerModule(module);
 
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) 
         {
@@ -77,6 +86,8 @@ public class RecordReader implements Runnable
                     break;
                 }
             }
+            System.out.println("END OF RECORDING");
+            alert.run();
         } 
         catch (IOException e) 
         {

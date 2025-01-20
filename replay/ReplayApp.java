@@ -2,7 +2,10 @@ package replay;
 
 import client.GameUI;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class ReplayApp extends Application 
@@ -11,10 +14,11 @@ public class ReplayApp extends Application
     public void start(Stage primaryStage) 
     {
         String filePath = null;
-        var parameters = getParameters();
+        var parameters = getParameters(); //kinda like c++ auto
+
         if (!parameters.getRaw().isEmpty()) 
         {
-            filePath = parameters.getRaw().get(0); // Get the first argument
+            filePath = parameters.getRaw().get(0);
         } 
         else 
         {
@@ -22,26 +26,44 @@ public class ReplayApp extends Application
             System.exit(1);
         }
 
-        // Initialize the UI and RecordReader
         GameUI gameUI = new GameUI();
         RecordReader reader = new RecordReader(filePath);
 
-        // Attach the GameUI controller to the RecordReader
         reader.addUI(gameUI);
+        reader.addAlert(()->
+        {
+            Platform.runLater(()->
+            {
+                Alert infoAlert = new Alert(AlertType.INFORMATION);
+                infoAlert.setTitle("Recording Finished");
+                infoAlert.setHeaderText("No more moves to play");
+                infoAlert.setContentText("End of recording.");
+                infoAlert.showAndWait();
+            });
+        });
+        gameUI.setupUI();
 
-        Scene scene = new Scene(gameUI.getRoot(), 1257, 975); //Oddly specific...
+        gameUI.getEndTurnButton().setText("INACTIVE");
+        gameUI.getMoveButton().setText("INACTIVE");
+        gameUI.setPlayerLabelText("YOU ARE WATCHING A REPLAY");
+
+        Scene scene = new Scene(gameUI.getRoot(), 1257, 975);
         primaryStage.setTitle("Chinese Checkers Replay");
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Start the RecordReader in a new thread
         Thread readerThread = new Thread(reader);
+
+        primaryStage.setOnCloseRequest(event -> 
+        {
+           readerThread.interrupt(); 
+        });
+
         readerThread.start();
-        
     }
 
     public static void main(String[] args) 
     {
-        launch(args); // Pass the command-line arguments to JavaFX
+        launch(args);
     }
 }
