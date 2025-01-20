@@ -74,11 +74,12 @@ public class GameUiController
         alert.setContentText("SOMEONE WON, BUT NOT YOU :C");
         alert.showAndWait().ifPresent(response -> 
         {
-            if (response == ButtonType.FINISH) 
+            if (response == ButtonType.OK) 
             {
                 try
                 {
                     receiverThread.interrupt();
+                    requestReceiver.closeStuff();
                 }
                 catch ( Exception e)
                 {
@@ -98,18 +99,19 @@ public class GameUiController
         alert.setContentText("You Have WON!");
         alert.showAndWait().ifPresent(response -> 
         {
-            if (response == ButtonType.FINISH) 
+            if (response == ButtonType.OK) 
             {
                 try
                 {
                     receiverThread.interrupt();
+                    requestReceiver.closeStuff();
                 }
                 catch ( Exception e)
                 {
                     e.printStackTrace();     
                 }
                 Platform.exit(); 
-                System.exit(0);      
+                System.exit(0);
             }
         });
     }

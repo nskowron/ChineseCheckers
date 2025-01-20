@@ -21,6 +21,7 @@ public class GameRequestMediator implements Runnable
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+    private boolean running = true;
 
     private GameUiController gameEndPoint;
 
@@ -44,8 +45,13 @@ public class GameRequestMediator implements Runnable
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            while (true) 
+            while (running && !Thread.currentThread().isInterrupted()) 
             {
+                if (socket.isClosed()) 
+                {
+                    break;
+                }
+
                 Request request = (Request) in.readObject();
                 handleServerResponse(request);
             }
@@ -58,6 +64,50 @@ public class GameRequestMediator implements Runnable
                 gameEndPoint.getGameUI().appendToSystemOutput(e.getMessage());
             });
         }
+        finally
+        {
+            try 
+            {
+                if (socket != null && !socket.isClosed()) 
+                {
+                    socket.close();
+                }
+            } 
+            catch (IOException e) 
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void closeStuff() 
+    {
+        try 
+        {
+            if (out != null) 
+            {
+                out.flush();  // Ensure any remaining data is written out
+                out.close();  // Close the output stream
+            }
+            if (in != null) 
+            {
+                in.close();  // Close the input stream
+            }
+            if (socket != null && !socket.isClosed()) 
+            {
+                socket.close();  // Close the socket
+            }
+        } 
+        catch (IOException e)
+        {
+            e.printStackTrace();  // Handle any exceptions while closing
+        }
+    }
+    
+
+    public Socket getSocket()
+    {
+        return this.socket;
     }
 
     public void sendRequest(Request request) throws IOException 

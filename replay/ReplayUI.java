@@ -1,4 +1,4 @@
-package client;
+package replay;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,7 +16,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GameUI implements BoardUI
+import client.*;
+
+public class ReplayUI implements BoardUI
 {
     private ScrollPane root;
     private final BoardGridPane boardGridPane;
@@ -28,7 +30,7 @@ public class GameUI implements BoardUI
     private Button moveButton;
     private TextArea systemOutputArea;
 
-    public GameUI() 
+    public ReplayUI() 
     {
         root = new ScrollPane();
         this.boardGridPane = new BoardGridPane();
@@ -146,8 +148,8 @@ public class GameUI implements BoardUI
         rightVbox.getChildren().add(systemOutputArea);
 
         // Create buttons
-        endTurnButton = new Button("END TURN");
-        moveButton = new Button("MOVE");
+        endTurnButton = new Button("INACTIVE");
+        moveButton = new Button("INACTIVE");
         endTurnButton.setPrefSize(150, 80);
         moveButton.setPrefSize(150, 80);
         endTurnButton.setStyle("-fx-border-width: 5px; -fx-border-radius: 10px;-fx-background-radius: 15px;  -fx-border-color: rgb(30, 30, 30); -fx-background-color: rgb(40, 40, 40); -fx-text-fill: white;");
@@ -159,7 +161,7 @@ public class GameUI implements BoardUI
 
         rightVbox.getChildren().add(grid);
 
-        playerLabel = new Label("You are: ");
+        playerLabel = new Label("You are watching a Replay");
         playerLabel.setFont(Font.font("Arial", 18));
         playerLabel.setTextFill(Color.WHITE);
 

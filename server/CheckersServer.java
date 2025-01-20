@@ -17,6 +17,7 @@ import server.game.IMoveChecker;
 import server.game.GameAssetsFactory;
 import shared.Player;
 import shared.Request;
+import memento.Recorder;
 
 public class CheckersServer 
 {
@@ -37,6 +38,7 @@ public class CheckersServer
         IMoveChecker validator;
         try
         {
+            Recorder.initialize("game_updates.json");
             GameAssetsBuilder builder;
             if(args.length == 0)
             {
@@ -181,6 +183,10 @@ public class CheckersServer
         {
             LOGGER.severe(e.getMessage());
         }
+        finally
+        {
+            Recorder.shutdown();
+        }
     }
 
     public static Game getGame()
@@ -244,6 +250,7 @@ public class CheckersServer
             {
                 client.playerClient.send(request);
             }
+            Recorder.record(request);
         }
     }
 }
