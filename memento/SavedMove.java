@@ -1,12 +1,13 @@
 package memento;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import shared.GameState;
 
-public class SavedMove 
+public class SavedMove implements Serializable
 {
     public int moveID;
     public String playerColor;

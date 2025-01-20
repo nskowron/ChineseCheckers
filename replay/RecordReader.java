@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -33,14 +34,13 @@ public class RecordReader implements Runnable
     @Override
     public void run() 
     {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) 
+        try
         {
             ObjectMapper objectMapper = new ObjectMapper();
-            String line;
 
-            while (running && (line = reader.readLine()) != null) 
+            while (running) 
             {
-                SavedMove savedMove = objectMapper.readValue(line, SavedMove.class);
+                SavedMove savedMove = objectMapper.readValue(filePath, SavedMove.class);
 
                 Platform.runLater(() -> 
                 {
@@ -49,7 +49,7 @@ public class RecordReader implements Runnable
 
                 Thread.sleep(2000);
             }
-        } 
+        }
         catch (IOException | InterruptedException e) 
         {
             e.printStackTrace();
