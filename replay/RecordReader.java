@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.List;
 
@@ -34,33 +36,60 @@ public class RecordReader implements Runnable
     @Override
     public void run() 
     {
-        try
-        {
-            ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            while (running) 
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) 
+        {
+            String line;
+            while (running && (line = reader.readLine()) != null) 
             {
-                SavedMove savedMove = objectMapper.readValue(filePath, SavedMove.class);
-
-                Platform.runLater(() -> 
+                SavedMove savedMove;
+                try 
                 {
-                    handleUpdate(savedMove);
-                });
+                    savedMove = objectMapper.readValue(line, SavedMove.class);
+                } 
+                catch (Exception e) 
+                {
+                    System.err.println("Error deserializing JSON from line: " + line);
+                    e.printStackTrace();
+                    Platform.runLater(() -> 
+                    {
+                        if (gameEndPoint != null) 
+                        {
+                            gameEndPoint.appendToSystemOutput("Error deserializing line: " + e.getMessage());
+                        }
+                    });
+                    continue;
+                }
 
-                Thread.sleep(2000);
+                // Update the UI
+                Platform.runLater(() -> handleUpdate(savedMove));
+
+                try 
+                {
+                    Thread.sleep(2000);
+                } 
+                catch (InterruptedException e) 
+                {
+                    System.err.println("Thread interrupted: " + e.getMessage());
+                    Thread.currentThread().interrupt();
+                    stop();
+                    break;
+                }
             }
-        }
-        catch (IOException | InterruptedException e) 
+        } 
+        catch (IOException e) 
         {
+            System.err.println("Error reading file: " + filePath);
             e.printStackTrace();
-            stop();
-            if (gameEndPoint != null) 
+            Platform.runLater(() -> 
             {
-                Platform.runLater(() -> 
+                if (gameEndPoint != null) 
                 {
-                    gameEndPoint.appendToSystemOutput("Error reading record: " + e.getMessage());
-                });
-            }
+                    gameEndPoint.appendToSystemOutput("Error reading file: " + e.getMessage());
+                }
+            });
+            stop();
         }
     }
 

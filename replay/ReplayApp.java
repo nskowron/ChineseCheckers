@@ -29,13 +29,15 @@ public class ReplayApp extends Application
         // Attach the GameUI controller to the RecordReader
         reader.addUI(gameUI);
 
-        // Start the RecordReader in a new thread
-        Thread readerThread = new Thread(reader);
-        readerThread.start();
-
         Scene scene = new Scene(gameUI.getRoot(), 1257, 975); //Oddly specific...
         primaryStage.setTitle("Chinese Checkers Replay");
         primaryStage.setScene(scene);
+        primaryStage.show();
+
+        // Start the RecordReader in a new thread
+        Thread readerThread = new Thread(reader);
+        readerThread.start();
+        
     }
 
     public static void main(String[] args) 
