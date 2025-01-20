@@ -13,15 +13,18 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import server.RequestRunnable;
+import server.game.IBoard;
+import server.game.Node;
 import shared.GameState;
 import shared.Move;
 import shared.Player;
 import shared.Request;
 
-public class RandomBot implements Runnable
+public class ClosestMoveBot implements Runnable
 {
     private final Socket socket;
     private Player player;
+    private int[] target;
 
     private Map<String, RequestRunnable> requestHandler;
     ObjectOutputStream out;
@@ -31,10 +34,12 @@ public class RandomBot implements Runnable
 
     private boolean running;
 
-    public RandomBot() throws IOException
+    public ClosestMoveBot(IBoard board) throws IOException
     {
         LOGGER = Logger.getLogger("Bot");
         socket = new Socket("localhost", 12345);
+        target = null;
+        requestHandler = getDefaultRequestHandler(board);
         this.run();
     }
 
@@ -51,8 +56,6 @@ public class RandomBot implements Runnable
         {
             disconnect(false);
         }
-
-        requestHandler = getDefaultRequestHandler();
 
         while(running)
         {
@@ -136,7 +139,7 @@ public class RandomBot implements Runnable
         }
     }
 
-    private Map<String, RequestRunnable> getDefaultRequestHandler()
+    private Map<String, RequestRunnable> getDefaultRequestHandler(IBoard board)
     {
         Map<String, RequestRunnable> requestHandler = new HashMap<>();
 
@@ -158,6 +161,7 @@ public class RandomBot implements Runnable
             if(start instanceof String)
             {
                 player.setColor((String)start);
+                target = calculateTarget(board);
             }
             else
             {
@@ -188,10 +192,9 @@ public class RandomBot implements Runnable
                             if(get_moves.getType().equals("GET_MOVES") && get_moves.getData() instanceof List)
                             {
                                 List<?> moves = (List<?>)get_moves.getData();
-                                if(!moves.isEmpty() && moves.getLast() instanceof int[])
+                                if(!moves.isEmpty() && moves.get(0) instanceof int[])
                                 {
-                                    LOGGER.info("Trying to move [" + node.getKey()[0] + ", " + node.getKey()[1] + "] -> [" + ((int[])moves.getLast())[0] + ", " + ((int[])moves.getLast())[1] + "]");
-                                    send(new Request("MOVE", new Move(node.getKey(), (int[])moves.getLast())));
+                                    send(new Request("MOVE", new Move(node.getKey(), getClosestToTarget((List<int[]>)moves))));
                                     return;
                                 }
                             }
@@ -222,5 +225,52 @@ public class RandomBot implements Runnable
         });
 
         return requestHandler;
+    }
+
+    private int[] calculateTarget(IBoard board)
+    {
+        for(Node node : board.getNodes().values())
+        {
+            if(node.getColorTarget().equals(player.getColor()))
+            {
+                int nulls = 0;
+                for(Node neigbor : node.getNeighbors())
+                {
+                    if(neigbor == null)
+                    {
+                        ++nulls;
+                    }
+                }
+                if(nulls == 4)
+                {
+                    return node.getID();
+                }
+                LOGGER.info("NULLS: " + nulls);
+            }
+        }
+
+        LOGGER.severe("Problem calculating target node");
+        return null;
+    }
+
+    private int[] getClosestToTarget(List<int[]> nodes)
+    {
+        int[] closestNode = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for(int[] node : nodes)
+        {
+            int dx = node[0] - target[0];
+            int dy = node[1] - target[1];
+            double distance = Math.sqrt(dx * dx + dy * dy);
+
+            if(distance < minDistance)
+            {
+                minDistance = distance;
+                closestNode = node;
+            }
+        }
+
+        return closestNode;
     }
 }

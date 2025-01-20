@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-import server.bots.RandomBot;
+import server.bots.ClosestMoveBot;
 import server.game.Game;
 import server.game.GameAssetsBuilder;
 import server.game.IBoard;
@@ -74,7 +74,7 @@ public class CheckersServer
                     {
                         try
                         {
-                            new RandomBot();
+                            new ClosestMoveBot(board);
                         }
                         catch(IOException e)
                         {
@@ -213,20 +213,23 @@ public class CheckersServer
 
     public static void removeClient(int id) 
     {
+        LOGGER.info("Client " + id + " disconnected");
         synchronized(connectedClients)
         {
+            if(gameStarted.met)
+            {
+                for(ServerPlayer client : connectedClients)
+                {
+                    client.playerClient.disconnect(true);
+                }
+                return;
+            }
+            
             for(int i = 0; i < connectedClients.size(); ++i)
             {
                 if(connectedClients.get(i).id == id)
                 {
                     connectedClients.remove(i);
-                    LOGGER.info("Client " + id + " removed.");
-
-                    if(gameStarted.met)
-                    {
-                        broadcast(new Request("ERROR", new Error("Client " + id + " disconnected")));
-                    }
-
                     return;
                 }
             }
