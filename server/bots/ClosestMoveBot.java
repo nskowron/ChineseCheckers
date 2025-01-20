@@ -219,6 +219,10 @@ public class ClosestMoveBot implements Runnable
             }
         });
 
+        requestHandler.put("WON", (Object win) -> {
+            disconnect(true);
+        });
+
         requestHandler.put("ACKNOWLEDGE", (Object ack) -> {
             LOGGER.info("Acknowledged");
         });
