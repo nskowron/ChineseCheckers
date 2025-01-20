@@ -76,7 +76,8 @@ public class CheckersServer
                     {
                         try
                         {
-                            new ClosestMoveBot(board);
+                            Thread bot = new Thread(new ClosestMoveBot(board));
+                            bot.start();
                         }
                         catch(IOException e)
                         {
@@ -170,11 +171,16 @@ public class CheckersServer
                 LOGGER.info("Game has started");
             }
             
+            List<Thread> clientThreads = new ArrayList<>();
             for(ServerPlayer client : connectedClients)
+            {
+                clientThreads.add(client.clientThread);
+            }
+            for(Thread thread : clientThreads)
             {
                 try
                 {
-                    client.clientThread.join();
+                    thread.join();
                 }
                 catch(InterruptedException e) {}
             }
@@ -206,10 +212,7 @@ public class CheckersServer
                     client.ready = ready;
                 }
 
-                if(client.ready)
-                {
-                    players[0] += 1;
-                }
+                players[0] += client.ready ? 1 : 0;
             }
             everyoneReady = players[0] == players[1];
 
@@ -222,22 +225,13 @@ public class CheckersServer
         LOGGER.info("Client " + id + " disconnected");
         synchronized(connectedClients)
         {
-            if(gameStarted.met)
-            {
-                for(ServerPlayer client : connectedClients)
-                {
-                    client.playerClient.disconnect(true);
-                }
-                return;
-            }
-            
             for(int i = 0; i < connectedClients.size(); ++i)
             {
-                if(connectedClients.get(i).id == id)
+                if(gameStarted.met && connectedClients.get(i).id != id)
                 {
-                    connectedClients.remove(i);
-                    return;
+                    connectedClients.get(i).playerClient.send(new Request("ERROR", new Error("Client " + id + " disconnected")));
                 }
+                connectedClients.remove(i);
             }
         }
     }

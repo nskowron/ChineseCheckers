@@ -40,7 +40,6 @@ public class ClosestMoveBot implements Runnable
         socket = new Socket("localhost", 12345);
         target = null;
         requestHandler = getDefaultRequestHandler(board);
-        this.run();
     }
 
     @Override
@@ -222,6 +221,7 @@ public class ClosestMoveBot implements Runnable
             {
                 LOGGER.severe(((Error)error).getMessage());
             }
+            disconnect(false);
         });
 
         return requestHandler;
