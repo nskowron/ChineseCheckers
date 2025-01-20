@@ -65,6 +65,10 @@ public class ClientHandler implements Runnable
             while(!gameStarted.met)
             {
                 Request request = receive();
+                if(request == null)
+                {
+                    continue;
+                }
                 if(request.getType().equals("READY"))
                 {
                     requestHandler.get("READY").run(request.getData());
@@ -102,6 +106,10 @@ public class ClientHandler implements Runnable
         while(running)
         {
             Request request = receive();
+            if(request == null)
+            {
+                continue;
+            }
             RequestRunnable action = requestHandler.get(request.getType());
             if(action != null)
             {
@@ -135,9 +143,9 @@ public class ClientHandler implements Runnable
         CheckersServer.removeClient(id);
         try
         {
-            clientSocket.close();
             in.close();
             out.close();
+            clientSocket.close();
         }
         catch( IOException e )
         {
@@ -260,7 +268,6 @@ public class ClientHandler implements Runnable
                         Boolean won = game.move(player, (Move)move);
                         requestHandler.get("END_TURN").run(null);
 
-                        LOGGER.info("won? " + won);
                         if(won)
                         {
                             send(new Request("WON", player)); // or broadcast?
