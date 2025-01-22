@@ -1,6 +1,6 @@
 # Paths to external libraries
-JAVAFX_LIB=./javaFX/lib
-JACKSON_LIB=./Jackson
+JAVAFX_LIB=./lib
+JACKSON_LIB=./lib
 
 # Compilation output directory
 BIN_DIR=bin
