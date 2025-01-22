@@ -1,5 +1,6 @@
 package replay;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import client.GameUI;
@@ -16,12 +17,12 @@ public class ReplayApp extends Application
 
     @Override
     public void init() throws Exception {
-        context = SpringApplication.run(ReplayApp.class);
+        //context = SpringApplication.run(ReplayApp.class);
     }
 
     @Override
     public void stop() throws Exception {
-        context.close();
+        //context.close();
     }
 
     @Override

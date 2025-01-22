@@ -1,4 +1,4 @@
-# Paths to external libraries
+# Paths to external modules
 JAVAFX_LIB=./lib
 JACKSON_LIB=./lib
 SPRING_LIB=./lib
@@ -8,7 +8,7 @@ BIN_DIR=bin
 
 # Java compilation flags for Spring, JavaFX, and Jackson
 JAVAC_FLAGS=--module-path $(JAVAFX_LIB):$(JACKSON_LIB):$(SPRING_LIB) \
-            --add-modules javafx.controls,com.fasterxml.jackson.databind,org.springframework.context \
+            --add-modules javafx.controls,com.fasterxml.jackson.databind,spring.context \
             -d $(BIN_DIR)
 
 # Classpath for runtime
@@ -32,7 +32,7 @@ clean:
 
 runS:
 	java --module-path $(JAVAFX_LIB):$(JACKSON_LIB):$(SPRING_LIB) \
-	     --add-modules javafx.controls,com.fasterxml.jackson.databind,org.springframework.context \
+	     --add-modules javafx.controls,com.fasterxml.jackson.databind,spring.context \
 	     -cp $(CLASS_PATH) server.CheckersServer $(ARGS)
 
 runC:
@@ -47,5 +47,5 @@ runCR:
 
 runRep:
 	java --module-path $(JAVAFX_LIB):$(JACKSON_LIB):$(SPRING_LIB) \
-	     --add-modules javafx.controls,com.fasterxml.jackson.databind,org.springframework.context \
+	     --add-modules javafx.controls,com.fasterxml.jackson.databind,spring.context \
 	     -cp $(CLASS_PATH) replay.ReplayApp $(ARGS)

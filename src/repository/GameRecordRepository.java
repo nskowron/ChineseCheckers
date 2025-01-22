@@ -1,6 +1,7 @@
 package src.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.*;
+import org.springframework.data.jpa.repository.*;
 import src.entity.GameRecord;
 
 public interface GameRecordRepository extends JpaRepository<GameRecord, Integer> {
