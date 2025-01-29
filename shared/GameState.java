@@ -2,11 +2,12 @@ package shared;
 
 import java.util.Map;
 
+
 import server.game.Node;
 import server.game.Piece;
+import utils.IntMap;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 public class GameState implements Serializable
 {
@@ -19,7 +20,7 @@ public class GameState implements Serializable
         this.currentTurn = currentTurn;
         this.won = won;
 
-        Map<int[], String> boardColors = new HashMap<>();
+        Map<int[], String> boardColors = new IntMap<>();
         for(Map.Entry<int[], Node> node : nodes.entrySet())
         {
             Piece piece = node.getValue().getPiece();

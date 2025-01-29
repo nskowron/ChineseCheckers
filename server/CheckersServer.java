@@ -6,8 +6,10 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
+import server.bots.ClosestMoveBot;
 import server.game.Game;
 import server.game.GameAssetsBuilder;
 import server.game.IBoard;
@@ -15,6 +17,7 @@ import server.game.IMoveChecker;
 import server.game.GameAssetsFactory;
 import shared.Player;
 import shared.Request;
+import memento.Recorder;
 
 public class CheckersServer 
 {
@@ -35,6 +38,7 @@ public class CheckersServer
         IMoveChecker validator;
         try
         {
+            Recorder.initialize("game_updates.json");
             GameAssetsBuilder builder;
             if(args.length == 0)
             {
@@ -59,39 +63,67 @@ public class CheckersServer
         {
             LOGGER.info("Server is running on port " + PORT + "...");
 
+            // Consider putting commands and acceptance into their own classes
+            Thread commands = new Thread(() -> {
+                Scanner scanner = new Scanner(System.in);
+                while(true)
+                {
+                    String command = scanner.nextLine();
+
+                    // probably could add checking for args which bot
+                    // and make factory command -> runnable, instead of ifs
+                    if(command.equals("ADD_BOT"))
+                    {
+                        try
+                        {
+                            Thread bot = new Thread(new ClosestMoveBot(board));
+                            bot.start();
+                        }
+                        catch(IOException e)
+                        {
+                            LOGGER.severe("Bot creation failed");
+                        }
+                    }
+                    else if(command.equals("OFF"))
+                    {
+                        break;
+                    }
+                }
+                scanner.close();
+            });
+            commands.start();
+
             synchronized(gameStarted)
             {
                 Thread acceptance = new Thread(() -> {
                     while(!gameStarted.met)
                     {
-                        if(connectedClients.size() < 6)
+                        try
                         {
-                            try
+                            Socket clientSocket = serverSocket.accept();
+                            if(Thread.interrupted())
                             {
-                                Socket clientSocket = serverSocket.accept();
-                                LOGGER.info("New socket accepted");
-
-                                synchronized(connectedClients)
-                                {
-                                    everyoneReady = false;
-
-                                    Player player = new Player(clientIdCounter);
-                                    ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
-                                    Thread clientThread = new Thread(client);
-                                    ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
-
-                                    connectedClients.add(connectedClient);
-                                    ++clientIdCounter;
-
-                                    clientThread.start();
-                                }
+                                break;
                             }
-                            catch(IOException e){ LOGGER.severe(e.getMessage()); try{ Thread.sleep(1000); }catch( InterruptedException f ){}}
+
+                            LOGGER.info("New socket accepted");
+
+                            synchronized(connectedClients)
+                            {
+                                everyoneReady = false;
+
+                                Player player = new Player(clientIdCounter);
+                                ClientHandler client = new ClientHandler(clientIdCounter, clientSocket, player, gameStarted);
+                                Thread clientThread = new Thread(client);
+                                ServerPlayer connectedClient = new ServerPlayer(clientIdCounter, player, client, clientThread);
+
+                                connectedClients.add(connectedClient);
+                                ++clientIdCounter;
+
+                                clientThread.start();
+                            }
                         }
-                        else
-                        {
-                            try{ Thread.sleep(1000); }catch( InterruptedException e ){}
-                        }
+                        catch(IOException e){ LOGGER.severe(e.getMessage()); try{ Thread.sleep(1000); }catch( InterruptedException f ){ break; }}
                     }
                 });
                 acceptance.start();
@@ -117,10 +149,12 @@ public class CheckersServer
 
                             // Succeeded at creating game
                             acceptance.interrupt();
+                            Socket dummySocket = new Socket("localhost", PORT); // for breaking acceptance thread
+                            dummySocket.close();
                             break;
                         }
                     }
-                    catch(IllegalArgumentException e) // Wrong no. of players
+                    catch(IllegalArgumentException | IOException e) // Wrong no. of players
                     {
                         try{ Thread.sleep(1000); }catch( InterruptedException f ){}
                     }
@@ -129,14 +163,17 @@ public class CheckersServer
                 gameStarted.met = true;
                 LOGGER.info("Game has started");
             }
-            // ClientThreads wake up
-            // Wait for them?
-            // yup
+            
+            List<Thread> clientThreads = new ArrayList<>();
             for(ServerPlayer client : connectedClients)
+            {
+                clientThreads.add(client.clientThread);
+            }
+            for(Thread thread : clientThreads)
             {
                 try
                 {
-                    client.clientThread.join();
+                    thread.join();
                 }
                 catch(InterruptedException e) {}
             }
@@ -144,6 +181,10 @@ public class CheckersServer
         catch(IOException e) 
         {
             LOGGER.severe(e.getMessage());
+        }
+        finally
+        {
+            Recorder.shutdown();
         }
     }
 
@@ -164,10 +205,7 @@ public class CheckersServer
                     client.ready = ready;
                 }
 
-                if(client.ready)
-                {
-                    players[0] += 1;
-                }
+                players[0] += client.ready ? 1 : 0;
             }
             everyoneReady = players[0] == players[1];
 
@@ -177,20 +215,24 @@ public class CheckersServer
 
     public static void removeClient(int id) 
     {
+        LOGGER.info("Client " + id + " disconnected");
         synchronized(connectedClients)
         {
             for(int i = 0; i < connectedClients.size(); ++i)
             {
-                if(connectedClients.get(i).id == id)
+                ServerPlayer client = connectedClients.get(i);
+                if(gameStarted.met)
+                {
+                    connectedClients.remove(i--);
+                    if(client.id != id)
+                    {
+                        client.playerClient.send(new Request("ERROR", new Error("Client " + id + " disconnected")));
+                    }
+                }
+                else if(client.id == id)
                 {
                     connectedClients.remove(i);
-                    LOGGER.info("Client " + id + " removed.");
-
-                    if(gameStarted.met)
-                    {
-                        broadcast(new Request("ERROR", new Error("Client " + id + " disconnected")));
-                    }
-
+                    setReady(null, id);
                     return;
                 }
             }
@@ -205,6 +247,7 @@ public class CheckersServer
             {
                 client.playerClient.send(request);
             }
+            Recorder.record(request);
         }
     }
 }
