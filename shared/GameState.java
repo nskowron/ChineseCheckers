@@ -9,6 +9,10 @@ import utils.IntMap;
 
 import java.io.Serializable;
 
+/**
+ * Structure for the game state
+ * Sent to the clients on update
+ */
 public class GameState implements Serializable
 {
     public final Map<int[], String> board;

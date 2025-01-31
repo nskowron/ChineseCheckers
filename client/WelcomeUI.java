@@ -17,6 +17,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
+/**
+ * The waiting room UI
+ */
 public class WelcomeUI
 {
     private final VBox root;

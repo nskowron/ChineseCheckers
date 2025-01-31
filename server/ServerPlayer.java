@@ -2,6 +2,9 @@ package server;
 
 import shared.Player;
 
+/**
+ * All the data about a player on the server that is needed
+ */
 public class ServerPlayer
 {
     public final int id;

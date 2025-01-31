@@ -4,6 +4,10 @@ import shared.Player;
 
 import java.io.Serializable;
 
+/**
+ * Piece class
+ * Has a color and an owner - player
+ */
 public class Piece implements Serializable
 {
     private final Player owner;

@@ -12,6 +12,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
+/**
+ * Main gui controller for the game
+ * Sets up nodes' listeners for clicks
+ */
 public class GameUiController 
 {
     private final GameUI gameUI;

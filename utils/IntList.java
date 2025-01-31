@@ -3,6 +3,9 @@ package utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Helper class for the int[] list
+ */
 public class IntList extends ArrayList<int[]>
 {
     @Override

@@ -10,6 +10,10 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Recorder class for recording game moves
+ * Automatically records moves to a JSON file
+ */
 public class Recorder 
 {
     private Recorder() { throw new UnsupportedOperationException("This is a static class"); }
@@ -27,6 +31,9 @@ public class Recorder
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static boolean initialized = false;
 
+    /**
+     * Which file to write to
+     */
     public static void initialize(String fileName) 
     {
         if (initialized) 

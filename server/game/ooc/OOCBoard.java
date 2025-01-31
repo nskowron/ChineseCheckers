@@ -16,6 +16,9 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Board class for Order Out Of Chaos variant of the game
+ */
 public class OOCBoard implements IBoard
 {
     private Map<int[], Node> nodes;
@@ -79,6 +82,9 @@ public class OOCBoard implements IBoard
         return nodes;
     }
 
+    /**
+     * Lays the pieces in the middle, randomly
+     */
     @Override
     public void layPieces(List<Player> players) throws IllegalArgumentException
     {

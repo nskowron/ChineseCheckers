@@ -2,6 +2,12 @@ package shared;
 
 import java.io.Serializable;
 
+/**
+ * Request class
+ * Used for communication between client and server
+ * Holds information about the request type and data
+ * As simple as possible for easier serialization
+ */
 public class Request implements Serializable
 {
     protected final String type;

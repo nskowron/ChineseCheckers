@@ -2,6 +2,9 @@ package shared;
 
 import java.io.Serializable;
 
+/**
+ * Structure for the move
+ */
 public class Move implements Serializable
 {
     public final int[] startId;

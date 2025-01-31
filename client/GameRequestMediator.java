@@ -14,6 +14,10 @@ import java.lang.Error;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
+/**
+ * Mediator between the game and the server
+ * Handles requests and responses
+ */
 public class GameRequestMediator implements Runnable 
 {
     private final String SERVER_ADDRES;

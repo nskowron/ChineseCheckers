@@ -4,6 +4,9 @@ import java.util.Map;
 
 import javafx.scene.paint.Color;
 
+/**
+ * Helper class for translating color names to JavaFX Color objects
+ */
 public class ColorTranslator
 {
     private static final Map<String, Color> translation = Map.of(

@@ -4,6 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Node on the board
+ * All nodes are connected to 6 (possibly null) neighbors and create a graph
+ * Each node has an id which corresponds to its position on the board
+ * ColorStarting is the color of the piece that starts on this node
+ * ColorTarget is the color of the piece that should end on this node
+ */
 public class Node implements Serializable
 {
     public final int[] id;
@@ -65,6 +72,10 @@ public class Node implements Serializable
         return colorTarget;
     }
 
+    /**
+     * Takes the piece from the node
+     * If there's no piece, throws an error
+     */
     public Piece take() throws IllegalAccessError
     {
         if(placeholder == null)
@@ -76,6 +87,10 @@ public class Node implements Serializable
         return piece;
     }
 
+    /**
+     * Places a piece on the node
+     * If there's already a piece, throws an error
+     */
     public void place(Piece piece) throws IllegalAccessError
     {
         if(placeholder != null)

@@ -19,6 +19,10 @@ import shared.Player;
 import shared.Request;
 import memento.Recorder;
 
+/**
+ * Main server application class
+ * Manages client connections and game creation
+ */
 public class CheckersServer 
 {
     private static final int PORT = 12345;
@@ -34,12 +38,15 @@ public class CheckersServer
 
     public static void main(final String[] args) 
     {
+        // Use a factory to create the game assets based on run arguments
         IBoard board;
         IMoveChecker validator;
         try
         {
             Recorder.initialize("game_updates.json");
             GameAssetsBuilder builder;
+
+            // If no arguments are provided, use the basic game assets
             if(args.length == 0)
             {
                 builder = GameAssetsFactory.get("BASIC");
@@ -63,15 +70,16 @@ public class CheckersServer
         {
             LOGGER.info("Server is running on port " + PORT + "...");
 
-            // Consider putting commands and acceptance into their own classes
+            // Takes commands from the console at runtime such as adding bots
+            // [Consider putting commands and acceptance into their own classes]
             Thread commands = new Thread(() -> {
                 Scanner scanner = new Scanner(System.in);
                 while(true)
                 {
                     String command = scanner.nextLine();
 
-                    // probably could add checking for args which bot
-                    // and make factory command -> runnable, instead of ifs
+                    // [probably could add checking for args which bot]
+                    // [and make factory command -> runnable, instead of ifs]
                     if(command.equals("ADD_BOT"))
                     {
                         try
@@ -95,6 +103,7 @@ public class CheckersServer
 
             synchronized(gameStarted)
             {
+                // Accept clients and bots until the game is ready to start
                 Thread acceptance = new Thread(() -> {
                     while(!gameStarted.met)
                     {
@@ -128,6 +137,7 @@ public class CheckersServer
                 });
                 acceptance.start();
 
+                // Wait for all players to be ready and create the game
                 while(true)
                 {
                     while(everyoneReady == false)
@@ -136,6 +146,7 @@ public class CheckersServer
                     }
                     try
                     {
+                        // Create game
                         synchronized(connectedClients)
                         {
                             LOGGER.info("trying to create game - players: " + connectedClients.size());
@@ -164,6 +175,7 @@ public class CheckersServer
                 LOGGER.info("Game has started");
             }
             
+            // Wait for all clients to finish
             List<Thread> clientThreads = new ArrayList<>();
             for(ServerPlayer client : connectedClients)
             {
@@ -193,6 +205,10 @@ public class CheckersServer
         return game;
     }
 
+    /**
+     * Set the ready status of a client
+     * Broadcasts the new status to all clients
+     */
     public static void setReady(Boolean ready, int id)
     {
         synchronized(connectedClients)
@@ -213,6 +229,11 @@ public class CheckersServer
         }
     }
 
+    /**
+     * Remove a client from the list of connected clients
+     * If the game has started, send an error to all clients (cannot continue with a different number of players)
+     * If the game has not started, remove the client from the list and keep waiting for more clients
+     */
     public static void removeClient(int id) 
     {
         LOGGER.info("Client " + id + " disconnected");
@@ -239,6 +260,9 @@ public class CheckersServer
         }
     }
 
+    /**
+     * Broadcast any request to all connected clients
+     */
     public static void broadcast(Request request)
     {
         synchronized(connectedClients)

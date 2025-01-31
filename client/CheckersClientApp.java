@@ -4,7 +4,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-
+/**
+ * Main application class for the Checkers Client
+ */
 public class CheckersClientApp extends Application 
 {
     private Stage welcomeStage;

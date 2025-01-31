@@ -16,6 +16,10 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Custom board class for testing purposes
+ */
+@Deprecated
 public class TESTBoard implements IBoard
 {
     private Map<int[], Node> nodes;

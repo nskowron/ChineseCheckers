@@ -9,6 +9,9 @@ import java.util.Map;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 
+/**
+ * GridPane for the board GUI
+ */
 public class BoardGridPane extends GridPane 
 {
     private Map<int[], Color> starPositions = new HashMap<>();

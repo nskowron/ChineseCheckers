@@ -7,12 +7,18 @@ import server.game.*;
 import shared.Move;
 import utils.IntList;
 
+/**
+ * MoveChecker class for the basic game variant (but also for OOC)
+ */
 public class MoveChecker implements IMoveChecker
 {
     private IBoard board;
 
     private List<Node> visitedNodes;
 
+    /**
+     * Requires a specific board
+     */
     public MoveChecker(IBoard board)
     {
         this.board = board;
@@ -20,6 +26,9 @@ public class MoveChecker implements IMoveChecker
         this.visitedNodes = null;
     }
 
+    /**
+     * Pretty self-explanatory
+     */
     public boolean validMove(Piece piece, Move move)
     {
         Node startNode = board.findNodeById(move.startId);
@@ -96,6 +105,10 @@ public class MoveChecker implements IMoveChecker
         return commonNeighbors.size() == 1 && commonNeighbors.get(0).getPiece() != null;
     }
 
+    /**
+     * Returns a list of valid moves for a piece on a specific node
+     * Assumes the piece is picked up (kind of as if a player was thinking about where to move it)
+     */
     @Override
     public List<int[]> getValidMoves(Piece piece, int[] beginId)
     {

@@ -20,6 +20,11 @@ import shared.Move;
 import shared.Player;
 import shared.Request;
 
+/**
+ * Bot that moves to the closest target node
+ * Similarly to a real client it connects to the server and sends and receives requests
+ * Designed to run in a separate thread
+ */
 public class ClosestMoveBot implements Runnable
 {
     private final Socket socket;
@@ -145,6 +150,10 @@ public class ClosestMoveBot implements Runnable
         }
     }
 
+    /**
+     * Default request handler for the bot
+     * Scans board for the target node and remembers it
+     */
     private Map<String, RequestRunnable> getDefaultRequestHandler(IBoard board)
     {
         Map<String, RequestRunnable> requestHandler = new HashMap<>();
@@ -238,6 +247,9 @@ public class ClosestMoveBot implements Runnable
         return requestHandler;
     }
 
+    /**
+     * Calculates the target node for the bot
+     */
     private int[] calculateTarget(IBoard board)
     {
         for(Node node : board.getNodes().values())
@@ -264,6 +276,9 @@ public class ClosestMoveBot implements Runnable
         return null;
     }
 
+    /**
+     * Returns the closest node to the target node
+     */
     private int[] getClosestToTarget(List<int[]> nodes)
     {
         int[] closestNode = null;

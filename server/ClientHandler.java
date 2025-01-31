@@ -11,6 +11,11 @@ import java.util.logging.Logger;
 
 import server.game.Game;
 
+/**
+ * Client handler class
+ * Handles client requests and responses for each socket connection
+ * Designed to run in a separate thread
+ */
 public class ClientHandler implements Runnable 
 {
     private final int id;
@@ -26,6 +31,9 @@ public class ClientHandler implements Runnable
 
     private boolean running;
 
+    /**
+     * Takes the client id, socket, game player object and game started condition which it listens to
+     */
     public ClientHandler(int id, Socket clientSocket, Player player, Condition gameStarted) 
     {
         this.id = id;
@@ -43,6 +51,10 @@ public class ClientHandler implements Runnable
         LOGGER.info("Client handler created");
     }
     
+    /**
+     * Main client handler loop
+     * Handles client requests and responses based on the request type and map of request handlers
+     */
     @Override
     public void run() 
     {
@@ -57,10 +69,12 @@ public class ClientHandler implements Runnable
             disconnect(false);
         }
 
+        // Greet the client
         requestHandler = getDefaultRequestHandler();
         requestHandler.get("GREET").run(null);
         requestHandler.get("READY").run(Boolean.FALSE);
 
+        // Wait for the game to start and listen to ready requests
         Thread readiness = new Thread(() -> {
             while(!gameStarted.met && running)
             {
@@ -98,11 +112,12 @@ public class ClientHandler implements Runnable
         });
 
         readiness.start();
-        synchronized(gameStarted){}
-        readiness.interrupt(); // as a matter of fact i did not know the risk
+        synchronized(gameStarted){} // wait for game to start
+        readiness.interrupt();
 
         requestHandler.get("GAME_START").run(null);
         
+        // Main game loop - handle all requests
         while(running)
         {
             Request request = receive();
@@ -127,6 +142,7 @@ public class ClientHandler implements Runnable
         LOGGER.info("ClientHandler died");
     }
 
+    // Disconnect the client and remove from server list
     public void disconnect(boolean ok)
     {
         if(!running)
@@ -201,6 +217,9 @@ public class ClientHandler implements Runnable
         }
     }
 
+    /**
+     * Default request handler
+     */
     private Map<String, RequestRunnable> getDefaultRequestHandler()
     {
         Map<String, RequestRunnable> requestHandler = new HashMap<>();

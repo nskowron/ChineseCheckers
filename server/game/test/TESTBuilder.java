@@ -10,6 +10,10 @@ import server.game.IBoard;
 import server.game.IMoveChecker;
 import server.game.basic.MoveChecker;
 
+/**
+ * Builder class for the TEST game
+ */
+@Deprecated
 public class TESTBuilder implements GameAssetsBuilder
 {
     private IBoard board = null;

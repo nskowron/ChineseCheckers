@@ -9,6 +9,9 @@ import server.game.GameAssetsBuilder;
 import server.game.IBoard;
 import server.game.IMoveChecker;
 
+/**
+ * Builder class for the basic game
+ */
 public class Builder implements GameAssetsBuilder
 {
     private IBoard board = null;

@@ -10,6 +10,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import shared.GameState;
 
+/**
+ * SavedMove class
+ * For easy saving and loading of the game state
+ */
 public class SavedMove implements Serializable
 {
     public int moveID;

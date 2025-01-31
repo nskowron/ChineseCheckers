@@ -2,6 +2,9 @@ package src.entity;
 
 import javax.persistence.*;
 
+/**
+ * Entity class for the game records
+ */
 @Entity
 @Table(name = "game_records")
 public class GameRecord {

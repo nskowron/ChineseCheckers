@@ -4,6 +4,9 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+/**
+ * A graphical representation of a node on the board
+ */
 public class GraphicNode extends Circle 
 {
     private int[] id = new int[2]; // row, column

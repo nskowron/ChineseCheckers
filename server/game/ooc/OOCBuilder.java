@@ -10,6 +10,9 @@ import server.game.IBoard;
 import server.game.IMoveChecker;
 import server.game.basic.MoveChecker;
 
+/**
+ * Builder class for the Order Out Of Chaos game
+ */
 public class OOCBuilder implements GameAssetsBuilder
 {
     private IBoard board = null;

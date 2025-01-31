@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Helper class for the int[] map
+ */
 public class IntMap <T> extends HashMap<int[], T>
 {
     @Override

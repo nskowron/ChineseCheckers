@@ -1,5 +1,8 @@
 package utils;
 
+/**
+ * A pair - literally
+ */
 public class Pair<T, U> 
 {
     private final T first;

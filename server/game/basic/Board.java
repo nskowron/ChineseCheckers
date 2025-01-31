@@ -16,12 +16,19 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Board class basic variant of the game
+ */
 public class Board implements IBoard
 {
     private Map<int[], Node> nodes;
 
     private List<String> starColors;
 
+    /**
+     * Constructor
+     * Reads the board from a shared json file
+     */
     public Board(File jsonStarFile) throws IOException, StreamReadException, DatabindException
     {
         this.nodes = new IntMap<>();
@@ -80,6 +87,10 @@ public class Board implements IBoard
         return nodes;
     }
 
+    /**
+     * In this variant, the players are placed on the board in the corners of the star
+     * This method is called when all players are ready to play
+     */
     @Override
     public void layPieces(List<Player> players) throws IllegalArgumentException
     {
@@ -155,6 +166,9 @@ public class Board implements IBoard
         }
     }
 
+    /**
+     * Inner class to read the json file
+     */
     private static class Star
     {
         public List<String> starColors;

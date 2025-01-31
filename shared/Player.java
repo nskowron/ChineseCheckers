@@ -2,6 +2,10 @@ package shared;
 
 import java.io.Serializable;
 
+/**
+ * Game player
+ * Has an id and a color assigned
+ */
 public class Player implements Serializable
 {
     protected final int id;

@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Creator of game room with basic control
+ */
 public class GameUI implements BoardUI
 {
     private ScrollPane root;
@@ -59,6 +62,9 @@ public class GameUI implements BoardUI
         this.nodeSet.add(node);
     }
 
+    /**
+     * Eg. on click, highlight the node
+     */
     public void highlightNode(int[] nodeId)
     {
         GraphicNode node = findNodeById(nodeId);
@@ -112,6 +118,9 @@ public class GameUI implements BoardUI
         return null;
     }
 
+    /**
+     * Responsible for the prettyness
+     */
     public void setupUI() 
     {
         // Set up the Board

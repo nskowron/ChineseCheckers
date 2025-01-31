@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Interface for the game board
+ */
 public interface IBoard extends Serializable
 {
     public void move(Move move) throws IllegalAccessError;

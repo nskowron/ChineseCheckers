@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
+/**
+ * Main game class
+ */
 public class Game implements Serializable
 {
     private IMoveChecker checker;
@@ -21,6 +24,10 @@ public class Game implements Serializable
     private int currentTurn;
     private Map<int[], List<int[]> > validMoves;
 
+    /**
+     * Dependency-inverse constructor
+     * Game works with any board and move checker
+     */
     public Game(IMoveChecker checker, IBoard board, List<Player> gamePlayers) throws IllegalArgumentException
     {
         List<Player> players = new ArrayList<>();
@@ -48,6 +55,9 @@ public class Game implements Serializable
         );
     }
 
+    /**
+     * Checks if all the conditions are met and moves the piece
+     */
     public Boolean move(Player player, Move move) throws IllegalAccessError
     {
         if(player != players.get(currentTurn))
@@ -75,6 +85,10 @@ public class Game implements Serializable
         }
     }
 
+    /**
+     * Dynamically calculates the valid moves for a piece
+     * If the moves are already calculated, returns them for performance
+     */
     public List<int[]> getValidMoves(Player player, int[] beginId)
     {
         if(validMoves.get(beginId) != null)
@@ -101,6 +115,10 @@ public class Game implements Serializable
         return validEndIds;
     }
 
+    /**
+     * Ends the turn of the current player
+     * If there are no more players or it's not player's turn, throws an error
+     */
     public void endTurn(Player player) throws IllegalAccessError
     {
         if(player != players.get(currentTurn))
