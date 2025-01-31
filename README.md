@@ -10,8 +10,8 @@
     - `make runS` - to run BASIC variant
     - `make runS ARGS="OOC"`  - to run Order Out of Chaos variant
     - `make runS ARGS="TEST"` - to run special test variant
-- ### During server runtime:
-  - `ADD_BOT` - adds a bot
+- During server runtime:
+    - `ADD_BOT` - adds a bot
 - `make runC` - to run client
     - `make runCR` - to run resizable client (compatibility)
 - `make runRep ARGS="<filepath>"` - to run replay mode
