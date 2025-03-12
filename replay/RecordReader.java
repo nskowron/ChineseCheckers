@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import shared.ColorTranslator;
-import src.entity.GameRecord;
 import client.*;
 import memento.*;
 
@@ -18,20 +17,10 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 
 public class RecordReader implements Runnable 
 {
-    @Autowired
-    private src.repository.GameRecordRepository gameRecordRepository;
-    
-    public String read(int recordId) {
-        Optional<GameRecord> record = gameRecordRepository.findById(recordId);
-        return record.map(GameRecord::getGameData).orElse(null);
-    }
-
     private final String filePath;
     private boolean running = true;
     private GameUI gameEndPoint;

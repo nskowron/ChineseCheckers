@@ -8,7 +8,7 @@ BIN_DIR=bin
 
 # Java compilation flags for Spring, JavaFX, and Jackson
 JAVAC_FLAGS=--module-path $(JAVAFX_LIB):$(JACKSON_LIB):$(SPRING_LIB) \
-            --add-modules javafx.controls,com.fasterxml.jackson.databind,spring.context \
+            --add-modules javafx.controls,com.fasterxml.jackson.databind \
             -d $(BIN_DIR)
 
 # Classpath for runtime
@@ -18,7 +18,7 @@ CLASS_PATH=$(BIN_DIR):$(JAVAFX_LIB)/*:$(JACKSON_LIB)/*:$(SPRING_LIB)/*
 all:
 	javac $(JAVAC_FLAGS) server/CheckersServer.java
 	javac $(JAVAC_FLAGS) client/CheckersClientApp.java utils/*.java shared/*.java
-	javac $(JAVAC_FLAGS) replay/ReplayApp.java src/entity/*.java src/repository/*.java
+	javac $(JAVAC_FLAGS) replay/ReplayApp.java
 
 clean:
 	rm -rf $(BIN_DIR)/*.class
@@ -27,12 +27,10 @@ clean:
 	rm -rf $(BIN_DIR)/shared/*.class
 	rm -rf $(BIN_DIR)/utils/*.class
 	rm -rf $(BIN_DIR)/replay/*.class
-	rm -rf $(BIN_DIR)/src/entity/*.class
-	rm -rf $(BIN_DIR)/src/repository/*.class
 
 runS:
 	java --module-path $(JAVAFX_LIB):$(JACKSON_LIB):$(SPRING_LIB) \
-	     --add-modules javafx.controls,com.fasterxml.jackson.databind,spring.context \
+	     --add-modules javafx.controls,com.fasterxml.jackson.databind \
 	     -cp $(CLASS_PATH) server.CheckersServer $(ARGS)
 
 runC:
@@ -47,5 +45,5 @@ runCR:
 
 runRep:
 	java --module-path $(JAVAFX_LIB):$(JACKSON_LIB):$(SPRING_LIB) \
-	     --add-modules javafx.controls,com.fasterxml.jackson.databind,spring.context \
+	     --add-modules javafx.controls,com.fasterxml.jackson.databind \
 	     -cp $(CLASS_PATH) replay.ReplayApp $(ARGS)

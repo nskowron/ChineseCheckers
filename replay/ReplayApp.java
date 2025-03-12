@@ -1,8 +1,5 @@
 package replay;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-
 import client.GameUI;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -13,18 +10,6 @@ import javafx.stage.Stage;
 
 public class ReplayApp extends Application 
 {
-    private static ConfigurableApplicationContext context;
-
-    @Override
-    public void init() throws Exception {
-        //context = SpringApplication.run(ReplayApp.class);
-    }
-
-    @Override
-    public void stop() throws Exception {
-        //context.close();
-    }
-
     @Override
     public void start(Stage primaryStage) 
     {

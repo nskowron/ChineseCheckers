@@ -1,14 +1,10 @@
 package memento;
 
 import shared.Request;
-import src.entity.GameRecord;
-import src.repository.GameRecordRepository;
 import shared.GameState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Recorder class for recording game moves
@@ -17,14 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class Recorder 
 {
     private Recorder() { throw new UnsupportedOperationException("This is a static class"); }
-
-    @Autowired
-    private GameRecordRepository gameRecordRepository;
-    public void record(String json) {
-        GameRecord gameRecord = new GameRecord(json);
-        gameRecordRepository.save(gameRecord);
-        moveID++;
-    }
 
     private static volatile int moveID = 0;
     private static FileWriter fileWriter;
