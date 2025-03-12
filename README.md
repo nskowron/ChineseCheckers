@@ -1,7 +1,7 @@
 # Chinese Checkers:
 
-## [Dependencies](https://github.com/nskowron/ChineseCheckers/releases/tag/1.0.0)
-[Download dependencies](https://github.com/nskowron/ChineseCheckers/releases/download/1.0.0/lib.zip)
+## [Dependencies](https://github.com/nskowron/ChineseCheckers/releases/tag/1.1.0)
+[Download dependencies](https://github.com/nskowron/ChineseCheckers/releases/download/1.1.0/lib.zip)
 
 ## Build and run project
 - `make`
